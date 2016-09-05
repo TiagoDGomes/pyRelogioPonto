@@ -5,7 +5,6 @@ from _warnings import warn
 from relogioponto.base import RelogioPonto, UsuarioPonto
 import time
 from threading import Thread
-import tempfile
 import os
 
 RELOGIO_ENDERECO = '10.3.0.10'
@@ -29,9 +28,9 @@ class TestUsuarioPonto(unittest.TestCase):
     def test_salvar(self):
         if type(self.relogio) == RelogioPonto:
             with self.assertRaises(NotImplementedError) as e:
-                self.usuario.salvar()
+                self.usuario.save()
         else:            
-            self.usuario.salvar()
+            self.usuario.save()
     
     
 
@@ -61,6 +60,11 @@ class TestRelogioPonto(unittest.TestCase):
         usuario = None       
         with self.assertRaises(NotImplementedError) as e:
             lista = self.relogio.gravar_usuario(usuario)
+            
+    def test_apagarusuario(self):
+        usuario = None       
+        with self.assertRaises(NotImplementedError) as e:
+            lista = self.relogio.apagar_usuario(usuario)
             
     
     def test_enviarcomando(self):

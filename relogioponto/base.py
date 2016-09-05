@@ -2,21 +2,28 @@
 import socket
 from threading import Thread
 import time
-import json
 
 class UsuarioPonto(object):
     
     def __init__(self, relogio):
         self.relogio = relogio
         self.matriculas = []
+        self.nome = None
+        self.pis = None
+        self.verificar_digital = None
+        self.id = None
         
-    def salvar(self):
+    def save(self):
         self.relogio.gravar_usuario(self)
+        
+    
+    def delete(self):
+        self.relogio.apagar_usuario(self)
     
     def __str__(self, *args, **kwargs):
-        return json.dumps( {'nome': self.nome, 'pis': self.pis, 'matriculas': self.matriculas} )
+        return str( {'id': self.id, 'nome': self.nome, 'pis': self.pis, 'matriculas': self.matriculas} )
 
-
+   
     
     
 class RelogioPonto(object):
@@ -68,7 +75,8 @@ class RelogioPonto(object):
     def __del__(self):
         self.desconectar()
     
-    
+    def apagar_usuario(self, usuario):
+        raise NotImplementedError('Implementacao ausente')
         
     def desconectar(self):
         try:

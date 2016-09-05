@@ -32,17 +32,43 @@ class HenryPrisma(RelogioPonto):
     @property    
     def usuarios(self):
         return UsuarioPontoHenryLista(self) 
-        
+    
+    def _send(self, data, msg_ok='Sucesso ao salvar'):
+        browser = mechanize.Browser() 
+        response = browser.open(self.URL, data=data)
+        soup = BeautifulSoup(response.read())
+        defaultResponse = soup.find("div", id='defaultResponse')
+        resposta = defaultResponse.find("font", attrs={'class': 'fonte15'})
+        if resposta.text != msg_ok:
+            raise Exception(resposta.text)   
+         
     def gravar_usuario(self, usuario):
-        values = {'option=1&index=0&id=%3Fid%3F&wizard=0&pageIndex=0&lblFilterName=&lblFilterPis=&lblFilterRegistration=13563&lblName=TESte+2&lblPis=6666.66666.66%2F6&chkVerDig=on&registration%5B%5D=5678&registration%5B%5D=1234&x=22&y=24'}
+        
+        registration = ''
+        chkVerDig = ''
+        if usuario.verificar_digital:
+            chkVerDig = 'chkVerDig=on&'
+        for matricula in usuario.matriculas:
+            registration = '{old}registration[]={new}&'.format(old=registration, new=matricula) 
+        data = ('option=1&index=0&id=%3Fid%3F&wizard=0&pageIndex=0&x=22&y=24&lblName={nome}&lblPis={pis}&{chkVerDig}{registration}'
+                .format(nome=usuario.nome, pis=usuario.pis, chkVerDig=chkVerDig, registration=registration)  )  
 
+        self._send(data)
+        usuario.id = self.usuarios.filter(pis=usuario.pis)[0].id
+        
+    def apagar_usuario(self, usuario):
+        data = ('option=3&index=0&id={id}&wizard=0&pageIndex=0&x=10&y=6&cbxOrderBy=0&lblFilterName=&lblFilterPis=&lblFilterRegistration='
+                .format(id=usuario.id)  )  
 
+        self._send(data)
 
+            
 class UsuarioPontoHenryLista(object):
     
     def __init__(self, relogio):
         self.relogio = relogio
         self._list_usuarios = None
+        
     
     def all(self):
         return self.filter()
@@ -83,7 +109,7 @@ class UsuarioPontoHenryLista(object):
             soup = BeautifulSoup(html)
             #print ('new',html)
             table = soup.find("table", id='displayTable')
-            #print table.prettify()
+            print table.prettify()
             for row in table.findAll('tr')[1:]:
                 cols = row.findAll('td')
                 usuario = UsuarioPonto(self.relogio)
@@ -91,10 +117,15 @@ class UsuarioPontoHenryLista(object):
                 if cols[0].find('a'):                    
                     usuario.nome = cols[0].find('a').text
                     usuario.pis = cols[1].string   
-                    usuario.verificar_digital = cols[2].string                 
+                    usuario.verificar_digital = cols[2].string == 'Sim' 
+                    #usuario.id = cols[4].input(attrs={'type':'image'}).onclick    
+                    #print(cols[4].input(attrs={'type':'image'}))            
                     matriculas = cols[3].findAll(text=True)
                     for matricula in matriculas:
-                        matricula_text = str( matricula.string).strip()
+                        try:
+                            matricula_text = int( str( matricula.string).strip() )
+                        except:
+                            matricula_text = None
                         if matricula_text:
                             usuario.matriculas.append(matricula_text)
                         else:
@@ -104,5 +135,5 @@ class UsuarioPontoHenryLista(object):
                     contiver_paginas = False
             pagina = pagina + 1 
         return lista_usuarios
-    
-    
+
+        

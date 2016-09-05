@@ -6,7 +6,7 @@ from relogioponto.base import UsuarioPonto
 
 
 RELOGIO_PRISMA_ENDERECO = '10.3.0.10'
-RELOGIO_PRISMA_TOTAL_USUARIOS = 4
+RELOGIO_PRISMA_TOTAL_USUARIOS = 3
 
 class TestUsuarioPontoHenry(unittest.TestCase):
     
@@ -23,8 +23,7 @@ class TestUsuarioPontoHenry(unittest.TestCase):
     def test_usuario(self):        
         self.assertEqual(self.usuario.relogio, self.relogio)
     
-    def test_salvar(self):
-        self.usuario.salvar()
+
 
 
 class TestHenryPrisma(unittest.TestCase):    
@@ -43,25 +42,44 @@ class TestHenryPrisma(unittest.TestCase):
     def test_conectar_via_http(self):
         self.relogio.conectar_via_http()
         self.assertTrue(self.relogio.conectado_via_http)
-        
-    def test_listarusuarios(self):
-        lista = self.relogio.usuarios.all()
-        self.assertEqual(self.totalusuarios, len(lista))
     
-    def test_listarusuariosfilter(self):
-        lista = self.relogio.usuarios.filter(matricula='1002')
-        self.assertEqual(1, len(lista))
-    
-        
-    def test_gravarusuario(self):
+    def t_apagarusuario(self): 
+        usuario = self.relogio.usuarios.filter(matricula=112233)[0]
+        usuario.delete()
+        self.assertTrue(len( self.relogio.usuarios.filter(matricula=112233) ) == 0)  
+          
+    def test_usuarios(self):
+        print 1
+        '''if len(self.relogio.usuarios.filter(matricula=112233)) > 0:
+            self.t_apagarusuario()
+        '''    
         usuario = UsuarioPonto(self.relogio)
         usuario.nome = "TESTE 3"
         usuario.pis = "5555.55555.55/5" 
-        usuario.matriculas = ['112233','445566']
-        usuario.salvar()
-        lista = self.relogio.usuarios.filter(matricula='112233')
+        usuario.matriculas = [112233,445566]
+        usuario.verificar_digital = True
+        '''usuario.save()
+        self.assertTrue(usuario.id != None)'''
+
+        lista = self.relogio.usuarios.filter(matricula=112233)
+        self.assertTrue(len(lista)==1)                
+
         usuario_salvo = lista[0]
+        self.assertTrue(usuario_salvo.id != None)
+
+        self.assertEqual(usuario_salvo.nome, usuario.nome)
         self.assertEqual(usuario_salvo.pis, usuario.pis)
+        self.assertEqual(usuario_salvo.matriculas, usuario.matriculas)
+        self.assertEqual(usuario_salvo.verificar_digital, usuario.verificar_digital)
+
+        
+        lista = self.relogio.usuarios.all()
+        self.assertTrue(len(lista) >= 1)
+        self.t_apagarusuario()
+
+
+            
+
         
         
         
