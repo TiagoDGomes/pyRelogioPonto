@@ -23,7 +23,9 @@ class Colaborador(object):
     def __str__(self, *args, **kwargs):
         return str( {'id': self.id, 'nome': self.nome, 'pis': self.pis, 'matriculas': self.matriculas} )
 
-   
+    @property
+    def digitais(self):
+        return self.relogio.get_digitais(self)
     
     
 class RelogioPonto(object):
@@ -88,10 +90,13 @@ class RelogioPonto(object):
     
     @property    
     def colaboradores(self):
-        raise NotImplementedError('Implementacao ausente')
+        raise NotImplementedError('Implementacao ausente na classe filha RelogioPonto (colaboradores)')
     
     def gravar_colaborador(self, colaborador):
-        raise NotImplementedError('Implementacao ausente')
+        raise NotImplementedError('Implementacao ausente na classe filha RelogioPonto (gravar_colaborador)')
+    
+    def get_digitais(self, colaborador):
+        raise NotImplementedError('Implementacao ausente na classe filha RelogioPonto (get_digitais)')
     
     def enviar_comando(self, data):
         self.tcp_socket.send(data)

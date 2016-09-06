@@ -47,14 +47,16 @@ class TestRelogioPonto(unittest.TestCase):
         self.relogio.desconectar()
         del self.relogio 
    
-
     def test_conexao(self):
         self.assertTrue(self.relogio.conectado, u'Não conectado. Verifique o endereco se está correto ou se o dispositivo está conectado.')
-
         
     def test_listarcolaboradors(self):      
         with self.assertRaises(NotImplementedError) as e:
             lista = self.relogio.colaboradores
+    
+    def test_getdigitais(self):      
+        with self.assertRaises(NotImplementedError) as e:
+            lista = self.relogio.get_digitais(None)
     
     def test_gravarcolaborador(self):
         colaborador = None       
@@ -66,7 +68,6 @@ class TestRelogioPonto(unittest.TestCase):
         with self.assertRaises(NotImplementedError) as e:
             lista = self.relogio.apagar_colaborador(colaborador)
             
-    
     def test_enviarcomando(self):
         try:
             os.remove('callback_ok')
@@ -77,14 +78,18 @@ class TestRelogioPonto(unittest.TestCase):
             self.relogio.enviar_comando(chr(0))
         Thread(target=run).start()
         time.sleep(0.5)
-        self.assertTrue(os.path.isfile('callback_ok'))     
-        
+        self.assertTrue(os.path.isfile('callback_ok'))           
         
     def callback_enviarcomando(self, data):
         fo = open("callback_ok", "wb")
         fo.write('ok')
         fo.close()
 
+        
+        
+            
+        
+    
             
 if __name__ == '__main__':
     unittest.main()

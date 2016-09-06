@@ -6,6 +6,8 @@ from relogioponto.base import Colaborador
 
 
 RELOGIO_PRISMA_ENDERECO = '10.3.0.10'
+TESTAR_INSERCAO_EXCLUSAO = False
+COLABORADOR_MATRICULA = 13563
 
 class TestColaboradorHenry(unittest.TestCase):
     
@@ -13,7 +15,7 @@ class TestColaboradorHenry(unittest.TestCase):
         self.endereco = RELOGIO_PRISMA_ENDERECO
         self.relogio = HenryPrisma(self.endereco)
         self.relogio.conectar() 
-        self.colaborador = Colaborador(self.relogio)
+        self.colaborador = self.relogio.colaboradores.filter(matricula=COLABORADOR_MATRICULA)[0]
         
     def tearDown(self):
         self.relogio.desconectar()
@@ -22,10 +24,13 @@ class TestColaboradorHenry(unittest.TestCase):
     def test_colaborador(self):        
         self.assertEqual(self.colaborador.relogio, self.relogio)
     
+    def test_digitais(self):
+        digitais = self.colaborador.digitais
+        self.assertTrue(len(digitais) >= 0)
 
 
-
-class TestHenryPrisma(unittest.TestCase):    
+class TestHenryPrisma(unittest.TestCase): 
+       
     def setUp(self):
         self.endereco = RELOGIO_PRISMA_ENDERECO
         self.relogio = HenryPrisma(self.endereco)
@@ -42,45 +47,47 @@ class TestHenryPrisma(unittest.TestCase):
         self.assertTrue(self.relogio.conectado_via_http)
     
     def t_apagarcolaborador(self): 
-        colaborador = self.relogio.colaboradors.filter(matricula=112233)[0]
+        colaborador = self.relogio.colaboradores.filter(matricula=112233)[0]
         colaborador.delete()
-        self.assertTrue(len( self.relogio.colaboradors.filter(matricula=112233) ) == 0)  
+        self.assertTrue(len(self.relogio.colaboradores.filter(matricula=112233)) == 0)  
           
-    def not_test_colaboradors(self):
-
-        if len(self.relogio.colaboradors.filter(matricula=112233)) > 0:
-            self.t_apagarcolaborador()
-           
-        colaborador = Colaborador(self.relogio)
-        colaborador.nome = "TESTCASE"
-        colaborador.pis = "5555.55555.55/5" 
-        colaborador.matriculas = [112233,445566]
-        colaborador.verificar_digital = True
-        colaborador.save()
-        self.assertTrue(colaborador.id != None)
-
-        lista = self.relogio.colaboradors.filter(matricula=112233)
-        self.assertTrue(len(lista)==1)                
-
-        colaborador_salvo = lista[0]
-        self.assertTrue(colaborador_salvo.id != None)
-
-        self.assertEqual(colaborador_salvo.nome, colaborador.nome)
-        self.assertEqual(colaborador_salvo.pis, colaborador.pis)
-        self.assertEqual(colaborador_salvo.matriculas, colaborador.matriculas)
-        self.assertEqual(colaborador_salvo.verificar_digital, colaborador.verificar_digital)
-
-        
-        lista = self.relogio.colaboradors.all()
-        self.assertTrue(len(lista) >= 1)
-        self.t_apagarcolaborador()
-
-
+    def test_colaboradores(self):
+        global TESTAR_INSERCAO_EXCLUSAO
+        if not TESTAR_INSERCAO_EXCLUSAO:
+            warn('Testes de insercao e exclusao ignorados.')
+        else:
+            if len(self.relogio.colaboradores.filter(matricula=112233)) > 0:
+                self.t_apagarcolaborador()
+               
+            colaborador = Colaborador(self.relogio)
+            colaborador.nome = "TESTCASE"
+            colaborador.pis = "5555.55555.55/5" 
+            colaborador.matriculas = [112233,445566]
+            colaborador.verificar_digital = True
+            colaborador.save()
+            self.assertTrue(colaborador.id != None)
+    
+            lista = self.relogio.colaboradores.filter(matricula=112233)
+            self.assertTrue(len(lista)==1)                
+    
+            colaborador_salvo = lista[0]
+            self.assertTrue(colaborador_salvo.id != None)
+    
+            self.assertEqual(colaborador_salvo.nome, colaborador.nome)
+            self.assertEqual(colaborador_salvo.pis, colaborador.pis)
+            self.assertEqual(colaborador_salvo.matriculas, colaborador.matriculas)
+            self.assertEqual(colaborador_salvo.verificar_digital, colaborador.verificar_digital)
+    
             
+            lista = self.relogio.colaboradores.all()
+            self.assertTrue(len(lista) >= 1)
+            self.t_apagarcolaborador()
 
-        
         
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
+    
+    
+    

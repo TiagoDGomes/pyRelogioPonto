@@ -4,9 +4,7 @@ import urllib2
 import urllib
 import mechanize
 from BeautifulSoup import BeautifulSoup
-
-
-   
+  
     
     
 class HenryPrisma(RelogioPonto):
@@ -33,14 +31,17 @@ class HenryPrisma(RelogioPonto):
     def colaboradores(self):
         return ColaboradorHenryLista(self) 
     
-    def _send(self, data, msg_ok='Sucesso ao salvar'):
+    def _send(self, data):
         browser = mechanize.Browser() 
         response = browser.open(self.URL, data=data)
-        soup = BeautifulSoup(response.read())
+        return (response.read())         
+    
+    def _sendpost(self, data, msg_ok='Sucesso ao salvar'):
+        soup = self._send(data)
         defaultResponse = soup.find("div", id='defaultResponse')
         resposta = defaultResponse.find("font", attrs={'class': 'fonte15'})
         if resposta.text != msg_ok:
-            raise Exception(resposta.text)   
+            raise Exception(resposta.text)
          
     def gravar_colaborador(self, colaborador):
         
@@ -53,22 +54,38 @@ class HenryPrisma(RelogioPonto):
         data = ('option=1&index=0&id=%3Fid%3F&wizard=0&pageIndex=0&x=22&y=24&lblName={nome}&lblPis={pis}&{chkVerDig}{registration}'
                 .format(nome=colaborador.nome, pis=colaborador.pis, chkVerDig=chkVerDig, registration=registration))  
 
-        self._send(data)
+        self._sendpost(data)
         colaborador.id = self.colaboradores.filter(pis=colaborador.pis)[0].id
         
     def apagar_colaborador(self, colaborador):
         data = ('option=3&index=0&id={id}&wizard=0&pageIndex=0&x=10&y=6&cbxOrderBy=0&lblFilterName=&lblFilterPis=&lblFilterRegistration='
                 .format(id=colaborador.id))  
 
-        self._send(data)
+        self._sendpost(data)
+        
+    def get_digitais(self, colaborador):
+        data = ('option=16&index=7&id=5&wizard=0&visibleDiv=biometricEnable&visibleDivFooter=default&x=32&y=39')
+        digitais = []
+        raw_data = self._send(data)[2:]
+        for digital_raw in raw_data.split('\r\n'):
+            if len(digital_raw) > 0:
+                digital_raw_slice = digital_raw[2:].split('}')         
+                if int(digital_raw_slice[0]) in colaborador.matriculas:
+                    s = digital_raw_slice[2].find('{')
+                    digitais.append((int(digital_raw_slice[1]), 
+                                     int(digital_raw_slice[2][:s]), 
+                                     digital_raw_slice[2][s+3:], ))
+                
+        return digitais
+             
+        
 
             
 class ColaboradorHenryLista(object):
     
     def __init__(self, relogio):
         self.relogio = relogio
-        self._list_colaboradores = None
-        
+        self._list_colaboradores = None        
     
     def all(self):
         return self.filter()
