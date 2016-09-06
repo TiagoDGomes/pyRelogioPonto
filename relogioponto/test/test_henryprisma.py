@@ -2,14 +2,19 @@
 from relogioponto.henryprisma import HenryPrisma
 from _warnings import warn
 import unittest
-from relogioponto.base import Colaborador
+from relogioponto.base import Colaborador, Empregador, RelogioPontoException
 from datetime import datetime
 import time
+from copy import deepcopy
 
 
 RELOGIO_PRISMA_ENDERECO = '10.3.0.10'
 TESTAR_INSERCAO_EXCLUSAO = False
+TESTAR_ALTERACAO_DATAHORA = False
+TESTAR_ALTERACAO_EMPREGADOR = False
 COLABORADOR_MATRICULA = 13563
+
+
 
 class TestColaboradorHenry(unittest.TestCase):
     
@@ -56,7 +61,7 @@ class TestHenryPrisma(unittest.TestCase):
     def test_colaboradores(self):
         global TESTAR_INSERCAO_EXCLUSAO
         if not TESTAR_INSERCAO_EXCLUSAO:
-            warn('Testes de insercao e exclusao ignorados.')
+            warn('\nTestes de insercao e exclusao ignorados. Altere a variavel TESTAR_INSERCAO_EXCLUSAO para executar estes testes.\n')
         else:
             if len(self.relogio.colaboradores.filter(matricula=112233)) > 0:
                 self.t_apagarcolaborador()
@@ -86,13 +91,48 @@ class TestHenryPrisma(unittest.TestCase):
             self.t_apagarcolaborador()
     
     def test_hora(self):
-        data_relogio = self.relogio.data_hora
-        self.assertTrue(type(data_relogio)==datetime) 
-        agora = datetime.now()
-        self.relogio.data_hora = agora
-        data_relogio = self.relogio.data_hora        
-        delta = data_relogio - agora
-        self.assertTrue(delta.seconds >= -10 and delta.seconds <= 10)        
+        if not TESTAR_ALTERACAO_DATAHORA:
+            warn('\nTestes de alteracao de data e hora ignorados. Altere a variavel TESTAR_ALTERACAO_DATAHORA para executar estes testes.\n')
+            
+        else:
+            data_relogio = self.relogio.data_hora
+            self.assertTrue(type(data_relogio)==datetime) 
+            agora = datetime.now()
+            self.relogio.data_hora = agora
+            data_relogio = self.relogio.data_hora        
+            delta = data_relogio - agora
+            self.assertTrue(delta.seconds >= -10 and delta.seconds <= 10)  
+            
+    def test_empregador(self):
+        empregador = self.relogio.get_empregador()   
+        self.assertTrue(type(empregador) == Empregador)  
+        if not TESTAR_ALTERACAO_EMPREGADOR:
+            warn('\nTestes de alteracao de empregador ignorados. Altere a variavel TESTAR_ALTERACAO_EMPREGADOR para executar estes testes.\n')
+        else:    
+            alterado_empregador = Empregador()
+            alterado_empregador.razao_social = u'Teste'
+            alterado_empregador.local = u'Teste local'
+            alterado_empregador.documento = u'00.000.000/0000-00'
+            alterado_empregador.tipo_documento = 1
+            alterado_empregador.cei = u'00.000.00000/00'
+            print alterado_empregador
+            print empregador
+            with self.assertRaises(RelogioPontoException) as e:
+                self.relogio.set_empregador(alterado_empregador) 
+            
+            alterado_empregador.documento = u'26.347.567/0001-22'            
+            self.relogio.set_empregador(alterado_empregador) 
+            empregador_salvo = self.relogio.get_empregador()  
+             
+            self.assertEqual(empregador_salvo.razao_social, alterado_empregador.razao_social)  
+            self.assertEqual(empregador_salvo.local, alterado_empregador.local)  
+            self.assertEqual(empregador_salvo.documento, alterado_empregador.documento)  
+            self.assertEqual(empregador_salvo.tipo_documento, alterado_empregador.tipo_documento)  
+            self.assertEqual(empregador_salvo.cei, alterado_empregador.cei)  
+            
+            #self.relogio.set_empregador(empregador)
+            
+        
         
         
 if __name__ == "__main__":

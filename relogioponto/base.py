@@ -27,6 +27,23 @@ class Colaborador(object):
     def digitais(self):
         return self.relogio.get_digitais(self)
     
+class Empregador(object):
+    def __init__(self):
+        self.razao_social = None
+        self.local = None
+        self.tipo_documento = None
+        self.documento = None
+        self.cei = None
+        
+    def __str__(self, *args, **kwargs):
+        return str( {'razao_social': self.razao_social, 
+                     'local': self.local, 
+                     'tipo_documento': self.tipo_documento,
+                     'documento': self.documento,
+                     'cei': self.cei,                     
+                     } )
+
+
     
 class RelogioPonto(object):
         
@@ -95,7 +112,7 @@ class RelogioPonto(object):
     def gravar_colaborador(self, colaborador):
         raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (gravar_colaborador)')
     
-    def get_digitais(self, colaborador):
+    def get_digitais(self, colaborador=None):
         raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (get_digitais)')
     
     def enviar_comando(self, data):
@@ -117,4 +134,12 @@ class RelogioPonto(object):
     def data_hora(self, value):
         raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (data_hora)')
     
-        
+    def get_empregador(self):
+        raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (get_empregador)')
+    
+    def set_empregador(self, empregador):
+        raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (get_empregador)')
+
+
+class RelogioPontoException(Exception):
+    pass 

@@ -2,7 +2,7 @@
 import unittest
 
 from _warnings import warn
-from relogioponto.base import RelogioPonto, Colaborador
+from relogioponto.base import RelogioPonto, Colaborador, Empregador
 import time
 from threading import Thread
 import os
@@ -86,7 +86,7 @@ class TestRelogioPonto(unittest.TestCase):
         fo.write('ok')
         fo.close()
 
-    def test_hora(self):
+    def test_datahora(self):
         #data_hora = self.relogio.data_hora
         #self.assertTrue(type(data_hora)==datetime)
         with self.assertRaises(NotImplementedError) as e:
@@ -94,7 +94,12 @@ class TestRelogioPonto(unittest.TestCase):
         with self.assertRaises(NotImplementedError) as e:    
             self.relogio.data_hora = datetime.now()    
         
-            
+    def test_empregador(self):
+        with self.assertRaises(NotImplementedError) as e:
+            empregador = self.relogio.get_empregador()       
+        with self.assertRaises(NotImplementedError) as e:
+            empregador = Empregador()
+            self.relogio.set_empregador(empregador)       
         
     
             

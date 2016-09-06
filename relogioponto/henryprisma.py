@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
-from relogioponto.base import RelogioPonto, Colaborador
+from relogioponto.base import RelogioPonto, Colaborador, Empregador,\
+    RelogioPontoException
 import urllib2
 import urllib
 import mechanize
 from BeautifulSoup import BeautifulSoup
 from datetime import datetime
   
+def bin2hextxt(data):
+    return " ".join("{:02x}".format(ord(c)) for c in data)
     
+def hextxt2bin(text):
+    text = text.replace(" ","")
+    return text.decode('hex')   
     
 class HenryPrisma(RelogioPonto):
     
@@ -38,12 +44,19 @@ class HenryPrisma(RelogioPonto):
         return (response.read())         
     
     def _sendpost(self, post_raw, msg_ok='Sucesso ao salvar'):
-        html = self._send(post_raw)
-        soup = BeautifulSoup(html)
+        try:
+            # Python 2.6-2.7 
+            from HTMLParser import HTMLParser
+        except ImportError:
+            # Python 3
+            from html.parser import HTMLParser
+        h = HTMLParser()
+        html_text = self._send(post_raw)
+        soup = BeautifulSoup(html_text)
         defaultResponse = soup.find("div", id='defaultResponse')
         resposta = defaultResponse.find("font", attrs={'class': 'fonte15'})
         if resposta.text != msg_ok:
-            raise Exception(resposta.text)
+            raise RelogioPontoException(h.unescape(resposta.text))
          
     def gravar_colaborador(self, colaborador):
         
@@ -65,19 +78,30 @@ class HenryPrisma(RelogioPonto):
 
         self._sendpost(data)
         
-    def get_digitais(self, colaborador):
+    def get_digitais(self, colaborador=None):
         data = ('option=16&index=7&id=5&wizard=0&visibleDiv=biometricEnable&visibleDivFooter=default&x=32&y=39')
         digitais = []
         raw_data = self._send(data)[2:]
-        for digital_raw in raw_data.split('\r\n'):
+        len_binary = 411
+        for digital_raw in raw_data.split('\r\n\x33\x2b'):
             if len(digital_raw) > 0:
-                digital_raw_slice = digital_raw[2:].split('}')         
-                if int(digital_raw_slice[0]) in colaborador.matriculas:
-                    s = digital_raw_slice[2].find('{')
-                    digitais.append((int(digital_raw_slice[1]), 
-                                     int(digital_raw_slice[2][:s]), 
-                                     digital_raw_slice[2][s+3:], ))
+                matricula = int(digital_raw[2:22])   
+                if colaborador is None or matricula in colaborador.matriculas:
+                    digital_raw_slice = digital_raw[2:].split('}')
+                    posA = digital_raw_slice[2].find('{')
+                                 
+                    id1 = int(digital_raw_slice[1])
+                    id2 = int(digital_raw_slice[2][:posA])
+                        
+                    digitais.append(
+                                    (
+                                     id1, 
+                                     id2, 
+                                     digital_raw[:len_binary],
+                                     )
+                                    )
                 
+    
         return digitais
              
     @property
@@ -85,11 +109,7 @@ class HenryPrisma(RelogioPonto):
         raw = 'optionMenu=4&indexMenu=3&idMenu=&pageIndexMenu='
         html = self._send(raw)
         soup = BeautifulSoup(html)
-        defaultResponse = soup.find("input", id='edtDateTime')
-        for key, value in defaultResponse.attrs:
-            if key == 'value':
-                resposta = value
-                break
+        resposta = [value for key, value in soup.find("input", id='edtDateTime').attrs if key == 'value'][0]
         return datetime.strptime(resposta, '%d/%m/%Y %I:%M:%S')
 
     
@@ -100,9 +120,36 @@ class HenryPrisma(RelogioPonto):
         self._sendpost(raw)
         
         
+    def get_empregador(self):
+        empregador = Empregador()
+        raw = 'option=2&index=1&id=1&wizard=0&x=42&y=37'
+        html = self._send(raw)
+        soup = BeautifulSoup(html)
+        empregador.razao_social = [value for key, value in soup.find("input", id='lblName').attrs if key == 'value'][0]
+        empregador.local = [value for key, value in soup.find("input", id='lblLocal').attrs if key == 'value'][0]
+        empregador.documento = [value for key, value in soup.find("input", id='lblDocument').attrs if key == 'value'][0]
+        empregador.cei = [value for key, value in soup.find("input", id='lblCei').attrs if key == 'value'][0]        
+        empregador.tipo_documento = int( [value for key, value in soup.find("select", id='cbxDocType').find('option', selected="selected").attrs if key == 'value'][0] )
+        return empregador
     
-
+    def set_empregador(self, empregador):
+        values = {'option': '1',
+                  'index': '1',
+                  'id' : '1',
+                  'wizard': '0',
+                  'lblName' : unicode(empregador.razao_social).encode('utf-8'),
+                  'lblLocal': unicode(empregador.local).encode('utf-8'),
+                  'cbxDocType': unicode(empregador.tipo_documento).encode('utf-8'),
+                  'lblDocument': unicode(empregador.documento).encode('utf-8'),
+                  'lblCei': unicode(empregador.cei).encode('utf-8'),
+                  'x': '22',
+                  'y': '32',
+                  }    
+        post_raw = urllib.urlencode(values)                   
+        self._sendpost(post_raw)
             
+    
+                
 class ColaboradorHenryLista(object):
     
     def __init__(self, relogio):
