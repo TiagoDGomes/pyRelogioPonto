@@ -3,7 +3,7 @@ import socket
 from threading import Thread
 import time
 
-class UsuarioPonto(object):
+class Colaborador(object):
     
     def __init__(self, relogio):
         self.relogio = relogio
@@ -14,11 +14,11 @@ class UsuarioPonto(object):
         self.id = None
         
     def save(self):
-        self.relogio.gravar_usuario(self)
+        self.relogio.gravar_colaborador(self)
         
     
     def delete(self):
-        self.relogio.apagar_usuario(self)
+        self.relogio.apagar_colaborador(self)
     
     def __str__(self, *args, **kwargs):
         return str( {'id': self.id, 'nome': self.nome, 'pis': self.pis, 'matriculas': self.matriculas} )
@@ -75,7 +75,7 @@ class RelogioPonto(object):
     def __del__(self):
         self.desconectar()
     
-    def apagar_usuario(self, usuario):
+    def apagar_colaborador(self, colaborador):
         raise NotImplementedError('Implementacao ausente')
         
     def desconectar(self):
@@ -87,10 +87,10 @@ class RelogioPonto(object):
         self.tcp_socket = None
     
     @property    
-    def usuarios(self):
+    def colaboradores(self):
         raise NotImplementedError('Implementacao ausente')
     
-    def gravar_usuario(self, usuario):
+    def gravar_colaborador(self, colaborador):
         raise NotImplementedError('Implementacao ausente')
     
     def enviar_comando(self, data):

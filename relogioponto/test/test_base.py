@@ -2,7 +2,7 @@
 import unittest
 
 from _warnings import warn
-from relogioponto.base import RelogioPonto, UsuarioPonto
+from relogioponto.base import RelogioPonto, Colaborador
 import time
 from threading import Thread
 import os
@@ -10,27 +10,27 @@ import os
 RELOGIO_ENDERECO = '10.3.0.10'
 CALLBACK_OK = False
 
-class TestUsuarioPonto(unittest.TestCase):
+class TestColaborador(unittest.TestCase):
     
     def setUp(self):
         self.endereco = RELOGIO_ENDERECO
         self.relogio = RelogioPonto(self.endereco)
         self.relogio.conectar() 
-        self.usuario = UsuarioPonto(self.relogio)
+        self.colaborador = Colaborador(self.relogio)
         
     def tearDown(self):
         self.relogio.desconectar()
         del self.relogio   
          
-    def test_usuario(self):        
-        self.assertEqual(self.usuario.relogio, self.relogio)
+    def test_colaborador(self):        
+        self.assertEqual(self.colaborador.relogio, self.relogio)
     
     def test_salvar(self):
         if type(self.relogio) == RelogioPonto:
             with self.assertRaises(NotImplementedError) as e:
-                self.usuario.save()
+                self.colaborador.save()
         else:            
-            self.usuario.save()
+            self.colaborador.save()
     
     
 
@@ -38,7 +38,7 @@ class TestRelogioPonto(unittest.TestCase):
 
     def setUp(self):
         self.endereco = RELOGIO_ENDERECO
-        self.totalusuarios = 0
+        self.totalcolaboradors = 0
         self.relogio = RelogioPonto(self.endereco)
         self.relogio.conectar() 
         self.callback_ok = False
@@ -52,19 +52,19 @@ class TestRelogioPonto(unittest.TestCase):
         self.assertTrue(self.relogio.conectado, u'Não conectado. Verifique o endereco se está correto ou se o dispositivo está conectado.')
 
         
-    def test_listarusuarios(self):      
+    def test_listarcolaboradors(self):      
         with self.assertRaises(NotImplementedError) as e:
-            lista = self.relogio.usuarios
+            lista = self.relogio.colaboradores
     
-    def test_gravarusuario(self):
-        usuario = None       
+    def test_gravarcolaborador(self):
+        colaborador = None       
         with self.assertRaises(NotImplementedError) as e:
-            lista = self.relogio.gravar_usuario(usuario)
+            lista = self.relogio.gravar_colaborador(colaborador)
             
-    def test_apagarusuario(self):
-        usuario = None       
+    def test_apagarcolaborador(self):
+        colaborador = None       
         with self.assertRaises(NotImplementedError) as e:
-            lista = self.relogio.apagar_usuario(usuario)
+            lista = self.relogio.apagar_colaborador(colaborador)
             
     
     def test_enviarcomando(self):

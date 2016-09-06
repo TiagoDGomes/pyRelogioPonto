@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from relogioponto.base import RelogioPonto, UsuarioPonto
+from relogioponto.base import RelogioPonto, Colaborador
 import urllib2
 import urllib
 import mechanize
@@ -30,8 +30,8 @@ class HenryPrisma(RelogioPonto):
         
         
     @property    
-    def usuarios(self):
-        return UsuarioPontoHenryLista(self) 
+    def colaboradores(self):
+        return ColaboradorHenryLista(self) 
     
     def _send(self, data, msg_ok='Sucesso ao salvar'):
         browser = mechanize.Browser() 
@@ -42,32 +42,32 @@ class HenryPrisma(RelogioPonto):
         if resposta.text != msg_ok:
             raise Exception(resposta.text)   
          
-    def gravar_usuario(self, usuario):
+    def gravar_colaborador(self, colaborador):
         
         registration = ''
         chkVerDig = ''
-        if usuario.verificar_digital:
+        if colaborador.verificar_digital:
             chkVerDig = 'chkVerDig=on&'
-        for matricula in usuario.matriculas:
+        for matricula in colaborador.matriculas:
             registration = '{old}registration[]={new}&'.format(old=registration, new=matricula) 
         data = ('option=1&index=0&id=%3Fid%3F&wizard=0&pageIndex=0&x=22&y=24&lblName={nome}&lblPis={pis}&{chkVerDig}{registration}'
-                .format(nome=usuario.nome, pis=usuario.pis, chkVerDig=chkVerDig, registration=registration)  )  
+                .format(nome=colaborador.nome, pis=colaborador.pis, chkVerDig=chkVerDig, registration=registration))  
 
         self._send(data)
-        usuario.id = self.usuarios.filter(pis=usuario.pis)[0].id
+        colaborador.id = self.colaboradores.filter(pis=colaborador.pis)[0].id
         
-    def apagar_usuario(self, usuario):
+    def apagar_colaborador(self, colaborador):
         data = ('option=3&index=0&id={id}&wizard=0&pageIndex=0&x=10&y=6&cbxOrderBy=0&lblFilterName=&lblFilterPis=&lblFilterRegistration='
-                .format(id=usuario.id)  )  
+                .format(id=colaborador.id))  
 
         self._send(data)
 
             
-class UsuarioPontoHenryLista(object):
+class ColaboradorHenryLista(object):
     
     def __init__(self, relogio):
         self.relogio = relogio
-        self._list_usuarios = None
+        self._list_colaboradores = None
         
     
     def all(self):
@@ -78,14 +78,14 @@ class UsuarioPontoHenryLista(object):
         browser = mechanize.Browser() 
         contiver_paginas = True
         pagina = 0
-        lista_usuarios = []
+        lista_colaboradores = []
         values = {
-                      'optionMenu': '4', 
-                      'indexMenu': str(pagina), 
+                      'optionMenu': '4',
+                      'indexMenu': str(pagina),
                       'index': '0',
                       'id': '-1',
                       'pageIndexMenu': str(pagina),
-                      'idMenu': '0',                       
+                      'idMenu': '0',
                       'x': '0',
                       'y': '0'
         }
@@ -102,38 +102,45 @@ class UsuarioPontoHenryLista(object):
         while contiver_paginas:   
             values['indexMenu'] = str(pagina)
             values['pageIndexMenu'] = str(pagina) 
-            #print values
             data = urllib.urlencode(values)                   
             response = browser.open(self.relogio.URL, data=data)
             html = response.read()
             soup = BeautifulSoup(html)
-            #print ('new',html)
-            table = soup.find("table", id='displayTable')
-            print table.prettify()
+            table = soup.find("table", id='displayTable')            
             for row in table.findAll('tr')[1:]:
                 cols = row.findAll('td')
-                usuario = UsuarioPonto(self.relogio)
+                colaborador = Colaborador(self.relogio)
                 matriculas = []
-                if cols[0].find('a'):                    
-                    usuario.nome = cols[0].find('a').text
-                    usuario.pis = cols[1].string   
-                    usuario.verificar_digital = cols[2].string == 'Sim' 
-                    #usuario.id = cols[4].input(attrs={'type':'image'}).onclick    
-                    #print(cols[4].input(attrs={'type':'image'}))            
+                if not cols[0].find('a'):
+                    contiver_paginas = False
+                else:                    
+                    colaborador.nome = cols[0].find('a').text
+                    colaborador.pis = cols[1].string   
+                    colaborador.verificar_digital = cols[2].string == 'Sim' 
+                    attrs = cols[4].find('input', value='Atualizar').attrs  
+                    for key, value in attrs:
+                        if key == 'onclick':
+                            start = value.find("'") + 1
+                            end = value.find("'", start)
+                            start = value.find("'", end + 1) + 1
+                            end = value.find("'", start + 1)
+                            colaborador.id = int(value[start:end])
+                            break
+                                   
                     matriculas = cols[3].findAll(text=True)
                     for matricula in matriculas:
                         try:
-                            matricula_text = int( str( matricula.string).strip() )
+                            matricula_text = int(str(matricula.string).strip())
                         except:
                             matricula_text = None
                         if matricula_text:
-                            usuario.matriculas.append(matricula_text)
+                            colaborador.matriculas.append(matricula_text)
                         else:
                             break 
-                    lista_usuarios.append(usuario)
-                else:
-                    contiver_paginas = False
+                    lista_colaboradores.append(colaborador)
+
+                    
             pagina = pagina + 1 
-        return lista_usuarios
+        return lista_colaboradores
 
         
