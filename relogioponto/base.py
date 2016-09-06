@@ -90,13 +90,13 @@ class RelogioPonto(object):
     
     @property    
     def colaboradores(self):
-        raise NotImplementedError('Implementacao ausente na classe filha RelogioPonto (colaboradores)')
+        raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (colaboradores)')
     
     def gravar_colaborador(self, colaborador):
-        raise NotImplementedError('Implementacao ausente na classe filha RelogioPonto (gravar_colaborador)')
+        raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (gravar_colaborador)')
     
     def get_digitais(self, colaborador):
-        raise NotImplementedError('Implementacao ausente na classe filha RelogioPonto (get_digitais)')
+        raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (get_digitais)')
     
     def enviar_comando(self, data):
         self.tcp_socket.send(data)
@@ -108,4 +108,13 @@ class RelogioPonto(object):
         
     def add_listener(self, callback_func):
         self.callback_func.append(callback_func)   
+        
+    @property
+    def data_hora(self):
+        raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (data_hora)')
+    
+    @data_hora.setter
+    def data_hora(self, value):
+        raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (data_hora)')
+    
         

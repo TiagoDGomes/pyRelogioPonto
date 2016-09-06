@@ -3,6 +3,8 @@ from relogioponto.henryprisma import HenryPrisma
 from _warnings import warn
 import unittest
 from relogioponto.base import Colaborador
+from datetime import datetime
+import time
 
 
 RELOGIO_PRISMA_ENDERECO = '10.3.0.10'
@@ -82,7 +84,15 @@ class TestHenryPrisma(unittest.TestCase):
             lista = self.relogio.colaboradores.all()
             self.assertTrue(len(lista) >= 1)
             self.t_apagarcolaborador()
-
+    
+    def test_hora(self):
+        data_relogio = self.relogio.data_hora
+        self.assertTrue(type(data_relogio)==datetime) 
+        agora = datetime.now()
+        self.relogio.data_hora = agora
+        data_relogio = self.relogio.data_hora        
+        delta = data_relogio - agora
+        self.assertTrue(delta.seconds >= -10 and delta.seconds <= 10)        
         
         
 if __name__ == "__main__":

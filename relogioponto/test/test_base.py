@@ -6,6 +6,7 @@ from relogioponto.base import RelogioPonto, Colaborador
 import time
 from threading import Thread
 import os
+from datetime import datetime
 
 RELOGIO_ENDERECO = '10.3.0.10'
 CALLBACK_OK = False
@@ -85,7 +86,13 @@ class TestRelogioPonto(unittest.TestCase):
         fo.write('ok')
         fo.close()
 
-        
+    def test_hora(self):
+        #data_hora = self.relogio.data_hora
+        #self.assertTrue(type(data_hora)==datetime)
+        with self.assertRaises(NotImplementedError) as e:
+            data_hora = self.relogio.data_hora
+        with self.assertRaises(NotImplementedError) as e:    
+            self.relogio.data_hora = datetime.now()    
         
             
         

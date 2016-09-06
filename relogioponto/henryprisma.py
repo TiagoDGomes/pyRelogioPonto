@@ -4,6 +4,7 @@ import urllib2
 import urllib
 import mechanize
 from BeautifulSoup import BeautifulSoup
+from datetime import datetime
   
     
     
@@ -31,13 +32,14 @@ class HenryPrisma(RelogioPonto):
     def colaboradores(self):
         return ColaboradorHenryLista(self) 
     
-    def _send(self, data):
+    def _send(self, post_raw):
         browser = mechanize.Browser() 
-        response = browser.open(self.URL, data=data)
+        response = browser.open(self.URL, data=post_raw)
         return (response.read())         
     
-    def _sendpost(self, data, msg_ok='Sucesso ao salvar'):
-        soup = self._send(data)
+    def _sendpost(self, post_raw, msg_ok='Sucesso ao salvar'):
+        html = self._send(post_raw)
+        soup = BeautifulSoup(html)
         defaultResponse = soup.find("div", id='defaultResponse')
         resposta = defaultResponse.find("font", attrs={'class': 'fonte15'})
         if resposta.text != msg_ok:
@@ -78,7 +80,27 @@ class HenryPrisma(RelogioPonto):
                 
         return digitais
              
+    @property
+    def data_hora(self):
+        raw = 'optionMenu=4&indexMenu=3&idMenu=&pageIndexMenu='
+        html = self._send(raw)
+        soup = BeautifulSoup(html)
+        defaultResponse = soup.find("input", id='edtDateTime')
+        for key, value in defaultResponse.attrs:
+            if key == 'value':
+                resposta = value
+                break
+        return datetime.strptime(resposta, '%d/%m/%Y %I:%M:%S')
+
+    
+    @data_hora.setter
+    def data_hora(self, date_value):
+        date_formatted = date_value.strftime('%d%%2F%m%%2F%Y+%I%%3A%M%%3A%S')
+        raw = 'option=1&index=3&id=-1&wizard=0&edtDateTime={date_formatted}&x=40&y=18'.format(date_formatted=date_formatted)
+        self._sendpost(raw)
         
+        
+    
 
             
 class ColaboradorHenryLista(object):
@@ -159,5 +181,5 @@ class ColaboradorHenryLista(object):
                     
             pagina = pagina + 1 
         return lista_colaboradores
-
-        
+    
+    
