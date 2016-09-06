@@ -31,9 +31,9 @@ class TestColaboradorHenry(unittest.TestCase):
     def test_colaborador(self):        
         self.assertEqual(self.colaborador.relogio, self.relogio)
     
-    def test_digitais(self):
-        digitais = self.colaborador.digitais
-        self.assertTrue(len(digitais) >= 0)
+    def test_biometrias(self):
+        biometrias = self.colaborador.biometrias
+        self.assertTrue(len(biometrias) >= 0)
 
 
 class TestHenryPrisma(unittest.TestCase): 

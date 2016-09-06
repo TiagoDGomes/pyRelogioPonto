@@ -55,9 +55,9 @@ class TestRelogioPonto(unittest.TestCase):
         with self.assertRaises(NotImplementedError) as e:
             lista = self.relogio.colaboradores
     
-    def test_getdigitais(self):      
+    def test_getbiometrias(self):      
         with self.assertRaises(NotImplementedError) as e:
-            lista = self.relogio.get_digitais(None)
+            lista = self.relogio.get_biometrias(None)
     
     def test_gravarcolaborador(self):
         colaborador = None       

@@ -78,9 +78,9 @@ class HenryPrisma(RelogioPonto):
 
         self._sendpost(data)
         
-    def get_digitais(self, colaborador=None):
+    def get_biometrias(self, colaborador=None):
         data = ('option=16&index=7&id=5&wizard=0&visibleDiv=biometricEnable&visibleDivFooter=default&x=32&y=39')
-        digitais = []
+        biometrias = []
         raw_data = self._send(data)[2:]
         len_binary = 411
         for digital_raw in raw_data.split('\r\n\x33\x2b'):
@@ -93,7 +93,7 @@ class HenryPrisma(RelogioPonto):
                     id1 = int(digital_raw_slice[1])
                     id2 = int(digital_raw_slice[2][:posA])
                         
-                    digitais.append(
+                    biometrias.append(
                                     (
                                      id1, 
                                      id2, 
@@ -102,7 +102,7 @@ class HenryPrisma(RelogioPonto):
                                     )
                 
     
-        return digitais
+        return biometrias
              
     @property
     def data_hora(self):
