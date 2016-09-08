@@ -7,12 +7,7 @@ import mechanize
 from BeautifulSoup import BeautifulSoup
 from datetime import datetime
   
-def bin2hextxt(data):
-    return " ".join("{:02x}".format(ord(c)) for c in data)
-    
-def hextxt2bin(text):
-    text = text.replace(" ","")
-    return text.decode('hex')   
+
     
 class HenryPrisma(RelogioPonto):
     
