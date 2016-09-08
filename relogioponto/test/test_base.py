@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import unittest
-
-from _warnings import warn
 from relogioponto.base import RelogioPonto, Colaborador, Empregador
 import time
 from threading import Thread
@@ -101,7 +99,10 @@ class TestRelogioPonto(unittest.TestCase):
             empregador = Empregador()
             self.relogio.set_empregador(empregador)       
         
-    
+    def test_getregistros(self):
+        with self.assertRaises(NotImplementedError) as e:
+            registros = self.relogio.get_afd()
+
             
 if __name__ == '__main__':
     unittest.main()

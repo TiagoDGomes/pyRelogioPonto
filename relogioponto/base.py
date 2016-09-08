@@ -109,6 +109,9 @@ class RelogioPonto(object):
     def colaboradores(self):
         raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (colaboradores)')
     
+    def get_afd(self, nsr=None, data_hora=None, formato=None):
+        raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (get_afd)')
+    
     def gravar_colaborador(self, colaborador):
         raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (gravar_colaborador)')
     

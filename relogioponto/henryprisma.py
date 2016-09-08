@@ -147,8 +147,26 @@ class HenryPrisma(RelogioPonto):
                   }    
         post_raw = urllib.urlencode(values)                   
         self._sendpost(post_raw)
-            
     
+    def get_afd(self, nsr=None, data_hora=None, formato=None):
+        if nsr is None and data_hora is None:
+            raw = 'option=12&index=5&id=0&wizard=0&visibleDiv=nofilter&visibleDivFooter=default&x=26&y=30'
+        elif nsr is not None:
+            raw = 'option=12&index=5&id=0&wizard=0&visibleDiv=nsr&lblNsrAfd={nsr}&&visibleDivFooter=default&x=43&y=31'.format(nsr=nsr)
+        else:            
+            raw = 'option=12&index=5&id=1&wizard=0&visibleDiv=dateTime&afdDateTime={dia}%2F{mes}%2F{ano}+{hora}%3A{minuto}%3A{segundo}&visibleDivFooter=default&x=26&y=50'.format(
+                                                        dia=data_hora.day, 
+                                                        mes=data_hora.month, 
+                                                        ano=data_hora.year, 
+                                                        hora=data_hora.hour,
+                                                        minuto=data_hora.minute,
+                                                        segundo=data_hora.second,
+                                                         )
+            print raw
+        ret = self._send(raw)
+        if '<!DOCTYPE html' in ret:
+            ret = ''
+        return ret
                 
 class ColaboradorHenryLista(object):
     

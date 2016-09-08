@@ -4,8 +4,6 @@ from _warnings import warn
 import unittest
 from relogioponto.base import Colaborador, Empregador, RelogioPontoException
 from datetime import datetime
-import time
-from copy import deepcopy
 
 
 RELOGIO_PRISMA_ENDERECO = '10.3.0.10'
@@ -132,8 +130,19 @@ class TestHenryPrisma(unittest.TestCase):
             
             #self.relogio.set_empregador(empregador)
             
-        
-        
+    def test_getafd(self):
+        todos = self.relogio.get_afd()
+        self.assertTrue(type(todos) == str)
+
+    def test_getafd_filtrado(self):
+        todos = self.relogio.get_afd()
+        filtrado = self.relogio.get_afd(nsr=2)
+        self.assertTrue(todos != filtrado)
+
+    def test_getafd_datahora(self):
+        filtro = self.relogio.get_afd(data_hora=datetime.now())
+        print filtro
+        self.assertTrue(filtro=='')
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
