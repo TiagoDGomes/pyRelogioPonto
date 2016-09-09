@@ -132,11 +132,11 @@ class HenryPrisma(RelogioPonto):
                   'index': '1',
                   'id' : '1',
                   'wizard': '0',
-                  'lblName' : unicode(empregador.razao_social).encode('utf-8'),
-                  'lblLocal': unicode(empregador.local).encode('utf-8'),
-                  'cbxDocType': unicode(empregador.tipo_documento).encode('utf-8'),
-                  'lblDocument': unicode(empregador.documento).encode('utf-8'),
-                  'lblCei': unicode(empregador.cei).encode('utf-8'),
+                  'lblName' : (empregador.razao_social),
+                  'lblLocal': (empregador.local),
+                  'cbxDocType': (empregador.tipo_documento),
+                  'lblDocument': (empregador.documento),
+                  'lblCei': (empregador.cei),
                   'x': '22',
                   'y': '32',
                   }    
@@ -157,7 +157,7 @@ class HenryPrisma(RelogioPonto):
                                                         minuto=data_hora.minute,
                                                         segundo=data_hora.second,
                                                          )
-            print raw
+            
         ret = self._send(raw)
         if '<!DOCTYPE html' in ret:
             ret = ''

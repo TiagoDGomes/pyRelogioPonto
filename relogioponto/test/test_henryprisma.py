@@ -65,7 +65,7 @@ class TestHenryPrisma(unittest.TestCase):
                 self.t_apagarcolaborador()
                
             colaborador = Colaborador(self.relogio)
-            colaborador.nome = "TESTCASE"
+            colaborador.nome = u"TESTCASE Á"
             colaborador.pis = "5555.55555.55/5" 
             colaborador.matriculas = [112233,445566]
             colaborador.verificar_digital = True

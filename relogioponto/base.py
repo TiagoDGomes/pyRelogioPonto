@@ -2,13 +2,14 @@
 import socket
 from threading import Thread
 import time
+from relogioponto.util import remover_acentos
 
 class Colaborador(object):
     
     def __init__(self, relogio):
         self.relogio = relogio
         self.matriculas = []
-        self.nome = None
+        self._nome = None
         self.pis = None
         self.verificar_digital = None
         self.id = None
@@ -16,7 +17,14 @@ class Colaborador(object):
     def save(self):
         self.relogio.gravar_colaborador(self)
         
+    @property
+    def nome(self):
+        return self._nome
     
+    @nome.setter
+    def nome(self, value):
+        self._nome = remover_acentos(value)
+        
     def delete(self):
         self.relogio.apagar_colaborador(self)
     
@@ -29,8 +37,8 @@ class Colaborador(object):
     
 class Empregador(object):
     def __init__(self):
-        self.razao_social = None
-        self.local = None
+        self._razao_social = None
+        self._local = None
         self.tipo_documento = None
         self.documento = None
         self.cei = None
@@ -43,7 +51,22 @@ class Empregador(object):
                      'cei': self.cei,                     
                      } )
 
-
+    @property
+    def razao_social(self):
+        return self._razao_social
+    
+    @razao_social.setter
+    def razao_social(self, value):
+        self._razao_social = remover_acentos(value)
+            
+    @property
+    def local(self):
+        return self._local
+    
+    @local.setter
+    def local(self, value):
+        self._local = remover_acentos(value) 
+           
     
 class RelogioPonto(object):
         
