@@ -141,7 +141,6 @@ class TestHenryPrisma(unittest.TestCase):
 
     def test_getafd_datahora(self):
         filtro = self.relogio.get_afd(data_hora=datetime.now())
-        print filtro
         self.assertTrue(filtro=='')
         
 if __name__ == "__main__":
