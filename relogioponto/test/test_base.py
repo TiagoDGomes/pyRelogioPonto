@@ -98,8 +98,9 @@ class TestRelogioPonto(unittest.TestCase):
         with self.assertRaises(NotImplementedError) as e:
             empregador = Empregador()
             self.relogio.set_empregador(empregador)       
+    
         
-    def test_getregistros(self):
+    def test_getafd(self):
         with self.assertRaises(NotImplementedError) as e:
             registros = self.relogio.get_afd()
 
