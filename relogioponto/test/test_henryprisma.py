@@ -4,6 +4,7 @@ from _warnings import warn
 import unittest
 from relogioponto.base import Colaborador, Empregador, RelogioPontoException
 from datetime import datetime
+import time
 
 
 RELOGIO_PRISMA_ENDERECO = '10.3.0.10'
@@ -31,7 +32,7 @@ class TestColaboradorHenry(unittest.TestCase):
     
     def test_biometrias(self):
         biometrias = self.colaborador.biometrias
-        self.assertTrue(len(biometrias) >= 0)
+        self.assertGreaterEqual(len(biometrias), 0)
 
 
 class TestHenryPrisma(unittest.TestCase): 
@@ -54,7 +55,7 @@ class TestHenryPrisma(unittest.TestCase):
     def t_apagarcolaborador(self): 
         colaborador = self.relogio.colaboradores.filter(matricula=112233)[0]
         colaborador.delete()
-        self.assertTrue(len(self.relogio.colaboradores.filter(matricula=112233)) == 0)  
+        self.assertEqual(len(self.relogio.colaboradores.filter(matricula=112233)), 0)  
           
     def test_colaboradores(self):
         global TESTAR_INSERCAO_EXCLUSAO
@@ -70,13 +71,13 @@ class TestHenryPrisma(unittest.TestCase):
             colaborador.matriculas = [112233,445566]
             colaborador.verificar_digital = True
             colaborador.save()
-            self.assertTrue(colaborador.id != None)
+            self.assertNotEqual(colaborador.id, None)
     
             lista = self.relogio.colaboradores.filter(matricula=112233)
-            self.assertTrue(len(lista)==1)                
+            self.assertEqual(len(lista), 1)                
     
             colaborador_salvo = lista[0]
-            self.assertTrue(colaborador_salvo.id != None)
+            self.assertNotEqual(colaborador_salvo.id, None)
     
             self.assertEqual(colaborador_salvo.nome, colaborador.nome)
             self.assertEqual(colaborador_salvo.pis, colaborador.pis)
@@ -94,7 +95,7 @@ class TestHenryPrisma(unittest.TestCase):
             
         else:
             data_relogio = self.relogio.data_hora
-            self.assertTrue(type(data_relogio)==datetime) 
+            self.assertEqual(type(data_relogio),datetime) 
             agora = datetime.now()
             self.relogio.data_hora = agora
             data_relogio = self.relogio.data_hora        
@@ -129,19 +130,19 @@ class TestHenryPrisma(unittest.TestCase):
             self.assertEqual(empregador_salvo.cei, alterado_empregador.cei)  
             
             #self.relogio.set_empregador(empregador)
-            
+    
     def test_getafd(self):
         todos = self.relogio.get_afd()
-        self.assertTrue(type(todos) == str)
+        self.assertEqual(type(todos), str)
 
     def test_getafd_filtrado(self):
         todos = self.relogio.get_afd()
         filtrado = self.relogio.get_afd(nsr=2)
-        self.assertTrue(todos != filtrado)
+        self.assertNotEqual(todos, filtrado)
 
     def test_getafd_datahora(self):
         filtro = self.relogio.get_afd(data_hora=datetime.now())
-        self.assertTrue(filtro=='')
+        self.assertEqual(filtro,'')
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
