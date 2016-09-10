@@ -105,12 +105,12 @@ class HenryPrisma(RelogioPonto):
         html = self._send(raw)
         soup = BeautifulSoup(html)
         resposta = [value for key, value in soup.find("input", id='edtDateTime').attrs if key == 'value'][0]
-        return datetime.strptime(resposta, '%d/%m/%Y %I:%M:%S')
+        return datetime.strptime(resposta, '%d/%m/%Y %H:%M:%S')
 
     
     @data_hora.setter
     def data_hora(self, date_value):
-        date_formatted = date_value.strftime('%d%%2F%m%%2F%Y+%I%%3A%M%%3A%S')
+        date_formatted = date_value.strftime('%d%%2F%m%%2F%Y+%H%%3A%M%%3A%S')
         raw = 'option=1&index=3&id=-1&wizard=0&edtDateTime={date_formatted}&x=40&y=18'.format(date_formatted=date_formatted)
         self._sendpost(raw)
         
