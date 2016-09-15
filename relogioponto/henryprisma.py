@@ -38,20 +38,19 @@ class HenryPrisma(RelogioPonto):
         response = browser.open(self.URL, data=post_raw)
         return (response.read())         
     
-    def _sendpost(self, post_raw, msg_ok='Sucesso ao salvar'):
-        try:
-            # Python 2.6-2.7 
-            from HTMLParser import HTMLParser
-        except ImportError:
-            # Python 3
-            from html.parser import HTMLParser
-        h = HTMLParser()
+    def _sendpost(self, post_raw, msg_ok='Sucesso ao salvar'):        
         html_text = self._send(post_raw)
         soup = BeautifulSoup(html_text)
         defaultResponse = soup.find("div", id='defaultResponse')
         resposta = defaultResponse.find("font", attrs={'class': 'fonte15'})
         if resposta.text != msg_ok:
-            raise RelogioPontoException(h.unescape(resposta.text))
+            try:
+                # Python 2.6-2.7 
+                from HTMLParser import HTMLParser
+            except ImportError:
+                # Python 3
+                from html.parser import HTMLParser
+            raise RelogioPontoException(HTMLParser().unescape(resposta.text))
          
     def gravar_colaborador(self, colaborador):
         

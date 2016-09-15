@@ -3,6 +3,7 @@ import socket
 from threading import Thread
 import time
 from relogioponto.util import remover_acentos
+from datetime import datetime
 
 class Colaborador(object):
     
@@ -166,6 +167,52 @@ class RelogioPonto(object):
     def set_empregador(self, empregador):
         raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (get_empregador)')
 
-
+    def get_registros(self, nsr=None, data_hora=None):
+        afd = self.get_afd(nsr, data_hora)
+        registros = []
+        for linha in afd.split('\r\n'):
+            if len(linha) > 0:
+                registro = {}                
+                registro['nsr'] = int(linha[0:9])
+                if registro['nsr'] == 999999999:
+                    registro['quantidade_tipo_2'] = int(linha[9:18])
+                    registro['quantidade_tipo_3'] = int(linha[18:27])
+                    registro['quantidade_tipo_4'] = int(linha[27:36])
+                    registro['quantidade_tipo_5'] = int(linha[36:45])
+                    registro['tipo'] = int(linha[45])  
+                else:
+                    tipo = int(linha[9:10])
+                    registro['tipo'] = tipo
+                    if tipo == 1: # Registro tipo "1" - Cabeçalho                     
+                        registro['tipo_identificador_empregador'] = int(linha[10:11])
+                        registro['documento'] = (linha[11:25])
+                        registro['cei'] = int(linha[25:37])
+                        registro['razao_social'] = linha[37:187].strip()
+                        registro['numero_rep'] = int(linha[187:204])
+                        registro['data_inicial'] = datetime.strptime(linha[204:212],"%d%m%Y")
+                        registro['data_final'] = datetime.strptime(linha[212:220],"%d%m%Y")
+                        registro['data_geracao'] = datetime.strptime(linha[220:232],"%d%m%Y%H%M")
+                        
+                    
+                    elif tipo == 2: # Registro de inclusão ou alteração da identificação da empresa no REP
+                        registro['data_gravacao'] = datetime.strptime(linha[10:22],"%d%m%Y%H%M")
+                        registro['identificador_empregador'] = int(linha[22])
+                        registro['documento'] = (linha[23:37]) or None                      
+                        registro['cei'] = int(linha[37:49]) or None 
+                        registro['razao_social'] = linha[49:199].strip()
+                        registro['local'] = linha[199:299].strip()
+                        
+                    elif tipo == 3: #Registro de marcação de ponto 
+                        registro['data_marcacao'] = datetime.strptime(linha[10:22],"%d%m%Y%H%M")
+                                             
+                        
+                    print tipo    
+                    print linha
+                print registro
+                registros.append(registro)
+        return (registros)     
+        #print afd
+    
 class RelogioPontoException(Exception):
-    pass 
+    pass
+

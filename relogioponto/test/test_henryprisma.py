@@ -4,7 +4,6 @@ from _warnings import warn
 import unittest
 from relogioponto.base import Colaborador, Empregador, RelogioPontoException
 from datetime import datetime
-import time
 
 
 RELOGIO_PRISMA_ENDERECO = '10.3.0.10'
@@ -116,7 +115,7 @@ class TestHenryPrisma(unittest.TestCase):
             alterado_empregador.cei = u'00.000.00000/00'
             print alterado_empregador
             print empregador
-            with self.assertRaises(RelogioPontoException) as e:
+            with self.assertRaises(RelogioPontoException):
                 self.relogio.set_empregador(alterado_empregador) 
             
             alterado_empregador.documento = u'26.347.567/0001-22'            
@@ -143,6 +142,12 @@ class TestHenryPrisma(unittest.TestCase):
     def test_getafd_datahora(self):
         filtro = self.relogio.get_afd(data_hora=datetime.now())
         self.assertEqual(filtro,'')
+    
+    
+                
+                    
+                
+                
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
