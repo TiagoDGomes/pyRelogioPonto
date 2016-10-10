@@ -5,6 +5,13 @@ import time
 from relogioponto.util import remover_acentos
 from datetime import datetime
 
+
+def get_rep_suportados():
+    import relogioponto
+    return [
+             (1, 'Henry - Prisma', relogioponto.henryprisma.HenryPrisma),
+           ]
+
 class Colaborador(object):
     
     def __init__(self, relogio):
