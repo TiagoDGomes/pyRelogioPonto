@@ -6,7 +6,9 @@ import urllib
 import mechanize
 from BeautifulSoup import BeautifulSoup
 from datetime import datetime
-  
+from cachetools import LRUCache
+
+cache = LRUCache(maxsize=50) 
 
     
 class HenryPrisma(RelogioPonto):
@@ -33,11 +35,13 @@ class HenryPrisma(RelogioPonto):
     def colaboradores(self):
         return ColaboradorHenryLista(self) 
     
+
     def _send(self, post_raw):
         browser = mechanize.Browser() 
         response = browser.open(self.URL, data=post_raw)
         return (response.read())         
     
+
     def _sendpost(self, post_raw, msg_ok='Sucesso ao salvar'):        
         html_text = self._send(post_raw)
         soup = BeautifulSoup(html_text)
@@ -200,9 +204,14 @@ class ColaboradorHenryLista(object):
         while contiver_paginas:   
             values['indexMenu'] = str(pagina)
             values['pageIndexMenu'] = str(pagina) 
-            data = urllib.urlencode(values)                   
-            response = browser.open(self.relogio.URL, data=data)
-            html = response.read()
+            data = urllib.urlencode(values) 
+            print(data)
+            if data in cache:
+                html = cache[data]
+            else:                   
+                response = browser.open(self.relogio.URL, data=data)
+                html = response.read()
+                cache[data] = html
             soup = BeautifulSoup(html)
             table = soup.find("table", id='displayTable')            
             for row in table.findAll('tr')[1:]:
