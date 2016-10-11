@@ -3,6 +3,7 @@ import unittest
 from relogioponto.test.test_henryprisma import RELOGIO_PRISMA_ENDERECO
 from relogioponto.henryprisma import HenryPrisma
 from datetime import datetime
+from relogioponto.base import Colaborador
 
 
 class TestRegistros(unittest.TestCase):    
@@ -68,10 +69,19 @@ class TestRegistros(unittest.TestCase):
                     quantidade_tipo_3 += 1
                     self.assertIn('data_marcacao' , registro)
                     self.assertEqual(type(registro['data_marcacao']), datetime)
-                    #self.assertIn('empregado' , registro)
+                    self.assertIn('colaborador' , registro)                
+                    self.assertTrue(type(registro['colaborador']) == Colaborador or registro['colaborador'] == None)                                  
+                
                     
                 elif registro['tipo'] == 4:
                     quantidade_tipo_4 += 1
                     
                 elif registro['tipo'] == 5:
                     quantidade_tipo_5 += 1
+                    
+                    
+       
+              
+                    
+                    
+                    
