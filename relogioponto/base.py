@@ -4,7 +4,7 @@ from threading import Thread
 import time
 from relogioponto.util import remover_acentos
 from datetime import datetime
-
+ 
 
 def get_rep_suportados():
     import relogioponto
@@ -36,7 +36,7 @@ class Colaborador(object):
     def delete(self):
         self.relogio.apagar_colaborador(self)
     
-    def __str__(self, *args, **kwargs):
+    def __repr__(self, *args, **kwargs):
         return str( {'id': self.id, 'nome': self.nome, 'pis': self.pis, 'matriculas': self.matriculas} )
 
     @property
@@ -77,13 +77,14 @@ class Empregador(object):
            
     
 class RelogioPonto(object):
-        
+    
     def __init__(self, endereco, porta=3000):
         self.tcp_socket = None
         self.endereco = endereco
         self.porta = porta
         self.conectado = None
         self.callback_func = []
+         
     
     def conectar(self):
         self.tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)            
@@ -118,6 +119,8 @@ class RelogioPonto(object):
             
         if not self.conectado:
             raise Exception("Falha na conexao. Codigo de erro %s." % (self.status_conexao))   
+        
+
     
     def __exit__(self, *err):
         self.desconectar()
@@ -211,14 +214,19 @@ class RelogioPonto(object):
                         
                     elif tipo == 3: #Registro de marcação de ponto 
                         registro['data_marcacao'] = datetime.strptime(linha[10:22],"%d%m%Y%H%M")
+                        colaborador = self.colaboradores.filter(pis=linha[22:34])
+                        if colaborador:                        
+                            registro['colaborador'] = colaborador[0]
+                        else:
+                            colaborador = Colaborador(self)
+                            colaborador.pis = linha[22:34] 
+                            registro['colaborador'] = colaborador
                                              
                         
-                    print tipo    
-                    print linha
-                print registro
+
                 registros.append(registro)
         return (registros)     
-        #print afd
+
     
 class RelogioPontoException(Exception):
     pass
