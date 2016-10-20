@@ -2,7 +2,7 @@
 from ..henryprisma import HenryPrisma
 from _warnings import warn
 import unittest
-from relogioponto.base import Colaborador, Empregador, RelogioPontoException
+from ..base import Colaborador, Empregador, RelogioPontoException
 from datetime import datetime
 
 
