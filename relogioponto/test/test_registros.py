@@ -3,7 +3,7 @@ import unittest
 from ..test.test_henryprisma import RELOGIO_PRISMA_ENDERECO
 from ..henryprisma import HenryPrisma
 from datetime import datetime
-from relogioponto.base import Colaborador
+from ..base import Colaborador
 
 
 class TestRegistros(unittest.TestCase):    
