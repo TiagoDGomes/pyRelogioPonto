@@ -2,14 +2,15 @@
 import socket
 from threading import Thread
 import time
-from relogioponto.util import remover_acentos
+from .util import remover_acentos
 from datetime import datetime
+
  
 
 def get_rep_suportados():
-    import relogioponto
+    from . import henryprisma
     return [
-             (1, 'Henry - Prisma', relogioponto.henryprisma.HenryPrisma),
+             (1, 'Henry - Prisma', henryprisma.HenryPrisma),
            ]
 
 class Colaborador(object):

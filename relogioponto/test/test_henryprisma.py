@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from relogioponto.henryprisma import HenryPrisma
+from ..henryprisma import HenryPrisma
 from _warnings import warn
 import unittest
 from relogioponto.base import Colaborador, Empregador, RelogioPontoException

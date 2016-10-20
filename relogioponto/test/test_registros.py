@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
-from relogioponto.test.test_henryprisma import RELOGIO_PRISMA_ENDERECO
-from relogioponto.henryprisma import HenryPrisma
+from ..test.test_henryprisma import RELOGIO_PRISMA_ENDERECO
+from ..henryprisma import HenryPrisma
 from datetime import datetime
 from relogioponto.base import Colaborador
 

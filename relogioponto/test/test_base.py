@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import unittest
-from relogioponto.base import RelogioPonto, Colaborador, Empregador
+from ..base import RelogioPonto, Colaborador, Empregador
 import time
 from threading import Thread
 import os

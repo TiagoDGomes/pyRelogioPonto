@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from relogioponto.base import RelogioPonto, Colaborador, Empregador,\
-    RelogioPontoException
+from .base import RelogioPonto, Colaborador, Empregador, RelogioPontoException
 import urllib2
 import urllib
 import mechanize
