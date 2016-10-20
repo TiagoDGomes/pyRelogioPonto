@@ -10,7 +10,10 @@ from datetime import datetime
 def get_rep_suportados():
     from . import henryprisma
     return [
-             (1, 'Henry - Prisma', henryprisma.HenryPrisma),
+             (1, 'Henry - Prisma', henryprisma.HenryPrisma, [
+                                                             ('endereco','str'),
+                                                             ('porta','int'),                                                             
+                                                            ]),
            ]
 
 class Colaborador(object):
