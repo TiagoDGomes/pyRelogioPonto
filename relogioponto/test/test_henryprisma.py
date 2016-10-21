@@ -165,6 +165,26 @@ class TestHenryPrismaDesconexao(unittest.TestCase):
                     
                 
                 
+
+class TestHenryPrismaSenhaIncorreta(unittest.TestCase): 
+       
+    def test_erro(self):
+        self.endereco = RELOGIO_PRISMA_ENDERECO
+        self.relogio = HenryPrisma(self.endereco)
+        self.relogio.conectar() 
+        #time.sleep(1)
+        self.relogio.desconectar() 
+        #time.sleep(1)
+        self.relogio.login = 'aaaaaaa'
+        self.relogio.password = 'bbbbbb'        
+        
+        with self.assertRaises(RelogioPontoException):
+            self.relogio.conectar() 
+     
+         
+                    
+                
+                
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

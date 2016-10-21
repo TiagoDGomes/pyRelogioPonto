@@ -11,28 +11,35 @@ cache = LRUCache(maxsize=50)
 
     
 class HenryPrisma(RelogioPonto):
-    login = 'prisma'
-    password = '123456'
+    
     def __init__(self, *args, **kwargs):        
         super(HenryPrisma, self).__init__(*args, **kwargs)
         self.conectado_via_http = None
         self.URL = 'http://{endereco}/prisma.cgi'.format(endereco=self.endereco)
+        self.login = 'prisma'
+        self.password = '123456'
+        
+    def conectar(self):
+        self.conectar_via_http()
+        RelogioPonto.conectar(self)
+        
         
     def conectar_via_http(self):
         if not self.conectado_via_http:
             values = {'login': self.login, 'password': self.password, 'option': '10', 'x': '0', 'y': '0'}
-            data = urllib.urlencode(values)
+            data = urllib.urlencode(values)           
             req = urllib2.Request(self.URL, data)
             response = urllib2.urlopen(req)
-            the_page = response.read()
-            senha_incorreta = the_page.find('Dados de login s&atilde;o inv&aacute;lidos') > 0
+            the_page = response.read()            
+            senha_incorreta = the_page.find('Dados de login') > 0
             if senha_incorreta:
-                raise Exception('Senha incorreta')
+                raise RelogioPontoException('Senha incorreta')
             self.conectado_via_http = True
         
     def desconectar(self):
         data = ('optionMenu=11&indexMenu=0&idMenu=&pageIndexMenu=')       
         self._send(data)
+        self.conectado_via_http = False
         RelogioPonto.desconectar(self)
     
         
