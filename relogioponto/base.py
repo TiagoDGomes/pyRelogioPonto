@@ -139,6 +139,7 @@ class RelogioPonto(object):
         try:
             self.tcp_socket.shutdown(1)
             self.tcp_socket.close()
+            self.conectado = False
         except:
             pass
         self.tcp_socket = None

@@ -4,6 +4,7 @@ from _warnings import warn
 import unittest
 from ..base import Colaborador, Empregador, RelogioPontoException
 from datetime import datetime
+import time
 
 
 RELOGIO_PRISMA_ENDERECO = '10.3.0.10'
@@ -46,7 +47,7 @@ class TestHenryPrisma(unittest.TestCase):
         
     def test_conexao(self):
         self.assertTrue(self.relogio.conectado, u'Não conectado. Verifique o endereco se está correto ou se o dispositivo está conectado.')
-
+        
     def test_conectar_via_http(self):
         self.relogio.conectar_via_http()
         self.assertTrue(self.relogio.conectado_via_http)
@@ -143,8 +144,24 @@ class TestHenryPrisma(unittest.TestCase):
         filtro = self.relogio.get_afd(data_hora=datetime.now())
         self.assertEqual(filtro,'')
     
-    
-                
+
+
+class TestHenryPrismaDesconexao(unittest.TestCase): 
+       
+    def setUp(self):
+        self.endereco = RELOGIO_PRISMA_ENDERECO
+        self.relogio = HenryPrisma(self.endereco)
+        self.relogio.conectar() 
+        time.sleep(1)
+        self.relogio.desconectar()        
+               
+    def test_desconexao(self):
+        self.assertFalse(self.relogio.conectado)
+        
+    def test_erro(self):
+        with self.assertRaises(RelogioPontoException):
+            colaboradores = self.relogio.colaboradores.all()  
+         
                     
                 
                 

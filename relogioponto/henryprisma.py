@@ -30,6 +30,11 @@ class HenryPrisma(RelogioPonto):
                 raise Exception('Senha incorreta')
             self.conectado_via_http = True
         
+    def desconectar(self):
+        data = ('optionMenu=11&indexMenu=0&idMenu=&pageIndexMenu=')       
+        self._send(data)
+        RelogioPonto.desconectar(self)
+    
         
     @property    
     def colaboradores(self):
@@ -38,7 +43,10 @@ class HenryPrisma(RelogioPonto):
 
     def _send(self, post_raw):
         browser = mechanize.Browser() 
-        response = browser.open(self.URL, data=post_raw)
+        try:
+            response = browser.open(self.URL, data=post_raw)
+        except Exception as e:
+            raise RelogioPontoException('Erro ao enviar comando: %s' % e)
         return (response.read())         
     
 
@@ -205,7 +213,6 @@ class ColaboradorHenryLista(object):
             values['indexMenu'] = str(pagina)
             values['pageIndexMenu'] = str(pagina) 
             data = urllib.urlencode(values) 
-            print(data)
             if data in cache:
                 html = cache[data]
             else:                   
@@ -213,7 +220,9 @@ class ColaboradorHenryLista(object):
                 html = response.read()
                 cache[data] = html
             soup = BeautifulSoup(html)
-            table = soup.find("table", id='displayTable')            
+            table = soup.find("table", id='displayTable')
+            if not table:
+                raise RelogioPontoException("Falha na conexão ou dados inválidos.")            
             for row in table.findAll('tr')[1:]:
                 cols = row.findAll('td')
                 colaborador = Colaborador(self.relogio)
