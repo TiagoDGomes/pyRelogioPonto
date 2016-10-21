@@ -11,7 +11,8 @@ cache = LRUCache(maxsize=50)
 
     
 class HenryPrisma(RelogioPonto):
-    
+    login = 'prisma'
+    password = '123456'
     def __init__(self, *args, **kwargs):        
         super(HenryPrisma, self).__init__(*args, **kwargs)
         self.conectado_via_http = None
@@ -19,7 +20,7 @@ class HenryPrisma(RelogioPonto):
         
     def conectar_via_http(self):
         if not self.conectado_via_http:
-            values = {'login': 'prisma', 'password': '123456', 'option': '10', 'x': '0', 'y': '0'}
+            values = {'login': self.login, 'password': self.password, 'option': '10', 'x': '0', 'y': '0'}
             data = urllib.urlencode(values)
             req = urllib2.Request(self.URL, data)
             response = urllib2.urlopen(req)
