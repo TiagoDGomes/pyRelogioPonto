@@ -51,3 +51,4 @@ def converter_registro_em_texto(self, params=[], matricula=None, pis=None, datah
         res.append(valor)            
 
     return "".join(res) 
+
