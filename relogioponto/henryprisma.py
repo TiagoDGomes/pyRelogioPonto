@@ -18,6 +18,10 @@ class HenryPrisma(RelogioPonto):
         self.URL = 'http://{endereco}/prisma.cgi'.format(endereco=self.endereco)
         self.login = 'prisma'
         self.password = '123456'
+        if 'login' in kwargs:
+            self.login = kwargs['login']
+        if 'password' in kwargs:
+            self.password = kwargs['password']
         
     def conectar(self):
         self.conectar_via_http()
