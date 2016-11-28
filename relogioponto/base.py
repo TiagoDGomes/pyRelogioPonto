@@ -90,7 +90,7 @@ class Empregador(object):
     
 class RelogioPonto(object):
     
-    def __init__(self, endereco, porta=3000):
+    def __init__(self, endereco, porta=3000, *args, **kwargs):
         self.tcp_socket = None
         self.endereco = endereco
         self.porta = porta
