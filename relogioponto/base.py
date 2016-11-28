@@ -11,10 +11,18 @@ def get_rep_suportados():
     from . import henryprisma
     return [
              (1, 'Henry - Prisma', henryprisma.HenryPrisma, [
-                                                             ('endereco','str'),
-                                                             ('porta','int'),                                                             
+                                                             ('endereco', str),
+                                                             ('porta', int),
+                                                             ('login', str),
+                                                             ('password', str),                                                                                                                          
                                                             ]),
            ]
+
+def get_class_por_tipo(tipo):
+    for rep in get_rep_suportados():
+        if tipo == rep[0]:
+            return rep[2]
+    return None
 
 class Colaborador(object):
     
@@ -82,7 +90,7 @@ class Empregador(object):
     
 class RelogioPonto(object):
     
-    def __init__(self, endereco, porta=3000):
+    def __init__(self, endereco, porta=3000, *args, **kwargs):
         self.tcp_socket = None
         self.endereco = endereco
         self.porta = porta
@@ -235,4 +243,5 @@ class RelogioPonto(object):
     
 class RelogioPontoException(Exception):
     pass
+
 

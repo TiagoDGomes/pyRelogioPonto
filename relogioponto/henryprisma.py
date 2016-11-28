@@ -18,16 +18,23 @@ class HenryPrisma(RelogioPonto):
         self.URL = 'http://{endereco}/prisma.cgi'.format(endereco=self.endereco)
         self.login = 'prisma'
         self.password = '123456'
+        if 'login' in kwargs and kwargs['login']:
+            self.login = kwargs['login']
+        if 'password' in kwargs and kwargs['password']:
+            self.password = kwargs['password']
         
-    def conectar(self):
+    def conectar(self, via_raw=False):
         self.conectar_via_http()
-        RelogioPonto.conectar(self)
+        if via_raw:
+            self.porta = 3000
+            RelogioPonto.conectar(self)
         
         
     def conectar_via_http(self):
-        if not self.conectado_via_http:
+        #if not self.conectado_via_http:
             values = {'login': self.login, 'password': self.password, 'option': '10', 'x': '0', 'y': '0'}
-            data = urllib.urlencode(values)           
+            data = urllib.urlencode(values) 
+            url = self.URL          
             req = urllib2.Request(self.URL, data)
             response = urllib2.urlopen(req)
             the_page = response.read()            
@@ -49,7 +56,8 @@ class HenryPrisma(RelogioPonto):
     
 
     def _send(self, post_raw):
-        browser = mechanize.Browser() 
+        browser = mechanize.Browser()
+        self.conectar()
         try:
             response = browser.open(self.URL, data=post_raw)
         except Exception as e:
