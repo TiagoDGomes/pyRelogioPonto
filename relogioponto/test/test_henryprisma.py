@@ -114,8 +114,6 @@ class TestHenryPrisma(unittest.TestCase):
             alterado_empregador.documento = u'00.000.000/0000-00'
             alterado_empregador.tipo_documento = 1
             alterado_empregador.cei = u'00.000.00000/00'
-            print alterado_empregador
-            print empregador
             with self.assertRaises(RelogioPontoException):
                 self.relogio.set_empregador(alterado_empregador) 
             
