@@ -143,6 +143,12 @@ class TestHenryPrisma(unittest.TestCase):
         self.assertEqual(filtro,'')
     
 
+    def test_quantidade_eventos_registrados(self):
+        i = self.relogio.quantidade_eventos_registrados
+        
+        self.assertEqual(int, type(i))
+    
+
 
 class TestHenryPrismaDesconexao(unittest.TestCase): 
        
