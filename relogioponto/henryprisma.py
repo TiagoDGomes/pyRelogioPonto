@@ -132,7 +132,6 @@ class HenryPrisma(RelogioPonto):
         soup = BeautifulSoup(html)
         resposta = [value for key, value in soup.find("input", id='edtDateTime').attrs if key == 'value'][0]
         return datetime.strptime(resposta, '%d/%m/%Y %H:%M:%S')
-
     
     @data_hora.setter
     def data_hora(self, date_value):
@@ -140,6 +139,14 @@ class HenryPrisma(RelogioPonto):
         raw = 'option=1&index=3&id=-1&wizard=0&edtDateTime={date_formatted}&x=40&y=18'.format(date_formatted=date_formatted)
         self._sendpost(raw)
         
+        
+    @property
+    def quantidade_eventos_registrados(self):
+        raw = 'optionMenu=18&indexMenu=9&idMenu=&pageIndexMenu='
+        html = self._send(raw)
+        soup = BeautifulSoup(html)
+        resposta = int(soup.find(id='statusEquipament').find('fieldset').find('table').findAll('td')[11].find(attrs={'class': 'fonte15'}).text)
+        return resposta
         
     def get_empregador(self):
         empregador = Empregador()

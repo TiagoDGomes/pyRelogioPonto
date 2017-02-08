@@ -156,6 +156,10 @@ class RelogioPonto(object):
     def colaboradores(self):
         raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (colaboradores)')
     
+    @property    
+    def quantidade_eventos_registrados(self):
+        raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (quantidade_eventos)')
+    
     def get_afd(self, nsr=None, data_hora=None):
         raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (get_afd)')
     
