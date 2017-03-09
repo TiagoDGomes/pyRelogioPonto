@@ -120,12 +120,21 @@ class ColaboradorOrion5ODBCLista(object):
     def filter(self, nome=None, pis=None, matricula=None):        
         cursor = self.relogio.conn.cursor()
         lista_colaboradores = []
-        cursor.execute("SELECT HE02_ST_NOME,HE02_BL_VERIFDIG, HE02_AT_COD, HE02_ST_MATRICULA FROM HE02 WHERE HE02_ST_PIS LIKE '%{pis}' OR HE02_ST_NOME LIKE '%{nome}%' AND HE02_ST_MATRICULA LIKE '%{matricula}'".format(nome=nome, pis=pis, matricula=matricula))
+        sql = '''SELECT HE02_ST_NOME,HE02_BL_VERIFDIG, HE02_AT_COD, HE02_ST_MATRICULA,HE02_ST_PIS FROM HE02 WHERE 1 = 1 '''
+        if pis:
+            sql += "AND HE02_ST_PIS LIKE '%{pis}' ".format(pis=somente_numeros(pis))  
+        if matricula:
+            sql += "AND HE02_ST_MATRICULA LIKE '%{matricula}' ".format(matricula=matricula)
+        if nome:
+            sql += "AND HE02_ST_NOME LIKE '%{nome}%'".format(nome=nome)
+            
+        cursor.execute(sql)
+            
         rows = cursor.fetchall()
         for row in rows: 
             colaborador = Colaborador(relogio=self.relogio)
             colaborador.nome = row[0]
-            colaborador.pis = pis
+            colaborador.pis = row[4]
             colaborador.verificar_digital = row[1]
             colaborador.id = row[2]
             colaborador.matriculas.append(row[3])
