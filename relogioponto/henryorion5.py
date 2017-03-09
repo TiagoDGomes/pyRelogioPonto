@@ -74,10 +74,10 @@ class Orion5ODBCMode(RelogioPonto):
         matricula = "{:020}".format( colaborador.matriculas[0] )
         cursor = self.conn.cursor()
         param_sql = []
-        param_sql.append( matricula ) 
-        param_sql.append( colaborador.nome )
-        param_sql.append( colaborador.verificar_digital )
-        param_sql.append( pis )
+        param_sql.append(matricula) 
+        param_sql.append(colaborador.nome)
+        param_sql.append(colaborador.verificar_digital)
+        param_sql.append(pis)
 
         
         cursor.execute("""SELECT HE02_ST_PIS 
