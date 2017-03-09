@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from .base import RelogioPonto, RelogioPontoException, Colaborador
 import pyodbc
-from pprint import pprint
 from core.util import somente_numeros
 
 
@@ -27,16 +26,20 @@ class Orion5ODBCMode(RelogioPonto):
     
     def get_afd(self, nsr=None, data_hora=None):
         cursor = self.conn.cursor()
-        sql = '''SELECT HE22_AT_COD, HE22_DT_REGISTRO, 
+        sql = '''SELECT HE22_AT_COD, 
+                        HE22_DT_REGISTRO, 
                         HE02_ST_PIS 
-                FROM HE22 
-                INNER JOIN HE02 ON HE02_ST_MATRICULA = HE22_ST_MATRICULA 
-                WHERE HE02_ST_PIS <> '000000000000' 
-                        AND HE02_ST_PIS <> ''
+                 FROM HE22 
+                 INNER JOIN HE02 
+                    ON HE02_ST_MATRICULA = HE22_ST_MATRICULA 
+                 WHERE HE02_ST_PIS <> '000000000000' 
+                   AND HE02_ST_PIS <> ''
               '''
         if nsr:
             if data_hora:                
-                cursor.execute(sql + 'AND HE22_DT_REGISTRO = ? AND HE22_AT_COD >= ?' , data_hora, nsr)
+                cursor.execute(sql + 
+                    """AND HE22_DT_REGISTRO = ? AND HE22_AT_COD >= ?""" ,
+                    data_hora, nsr)
             else:
                 cursor.execute(sql + 'AND HE22_AT_COD >= ?' , nsr)
         else:
@@ -48,7 +51,11 @@ class Orion5ODBCMode(RelogioPonto):
         rows = cursor.fetchall()
         afd = []
         for row in rows:
-            afd.append('{:09d}3{:%d%m%Y%H%M}{:012d}'.format(row[0],row[1], int(row[2])))
+            afd.append('{:09d}3{:%d%m%Y%H%M}{:012d}'.format(
+                                                row[0],
+                                                row[1], 
+                                                int(row[2]))
+                       )
         return "\r\n".join(afd)
     
     @property
@@ -73,17 +80,28 @@ class Orion5ODBCMode(RelogioPonto):
         param_sql.append( pis )
 
         
-        cursor.execute("SELECT HE02_ST_PIS FROM HE02 WHERE HE02_ST_PIS = ?", pis)
+        cursor.execute("""SELECT HE02_ST_PIS 
+                            FROM HE02 
+                            WHERE HE02_ST_PIS = ?""", pis)
+        
         row = cursor.fetchone()
         if row: # se há um colaborador com PIS... 
             sql = '''UPDATE HE02 SET HE02_ST_MATRICULA = ?, 
                             HE02_ST_NOME = ? , 
                             HE02_BL_VERIFDIG = ? 
-                            WHERE HE02_ST_PIS = ?  
-                            '''
+                     WHERE HE02_ST_PIS = ?  
+                     '''
             
         else: 
-            cursor.execute("SELECT HE02_ST_MATRICULA FROM HE02 WHERE HE02_ST_MATRICULA LIKE '%{matricula}'".format(matricula=colaborador.matriculas[0]))
+            # PIS não encontrado. Procurar por matrícula...
+            cursor.execute("""SELECT HE02_ST_MATRICULA 
+                              FROM HE02 
+                              WHERE HE02_ST_MATRICULA 
+                                  LIKE '%{matricula}'
+                            """.format(
+                                    matricula=colaborador.matriculas[0]
+                                    )
+                           )
             row = cursor.fetchone()
             if row: # se tem colaborador com uma matrícula especifica...
                 sql = '''UPDATE HE02 
@@ -102,9 +120,17 @@ class Orion5ODBCMode(RelogioPonto):
                                             HE02_ST_PIS) 
                                 VALUES (?,?,?,?) '''
                  
-        cursor.execute(sql,param_sql[0],param_sql[1],param_sql[2],param_sql[3]) #atualizar dados        
+        cursor.execute(sql,
+                       param_sql[0],
+                       param_sql[1],
+                       param_sql[2],
+                       param_sql[3]) #atualizar dados        
             
-        cursor.execute("SELECT HE02_AT_COD FROM HE02 WHERE HE02_ST_PIS = ?", pis)
+        cursor.execute("""
+                        SELECT HE02_AT_COD 
+                        FROM HE02 WHERE HE02_ST_PIS = ?""",
+                        pis
+                      )
         row = cursor.fetchone()
         colaborador.id = row[0]   
          
@@ -120,11 +146,20 @@ class ColaboradorOrion5ODBCLista(object):
     def filter(self, nome=None, pis=None, matricula=None):        
         cursor = self.relogio.conn.cursor()
         lista_colaboradores = []
-        sql = '''SELECT HE02_ST_NOME,HE02_BL_VERIFDIG, HE02_AT_COD, HE02_ST_MATRICULA,HE02_ST_PIS FROM HE02 WHERE 1 = 1 '''
+        sql = '''SELECT HE02_ST_NOME,
+                        HE02_BL_VERIFDIG, 
+                        HE02_AT_COD, 
+                        HE02_ST_MATRICULA,
+                        HE02_ST_PIS 
+                 FROM HE02 WHERE 1 = 1 '''
         if pis:
-            sql += "AND HE02_ST_PIS LIKE '%{pis}' ".format(pis=somente_numeros(pis))  
+            sql += "AND HE02_ST_PIS LIKE '%{pis}' ".format(
+                                                     pis=somente_numeros(pis)
+                                                    )  
         if matricula:
-            sql += "AND HE02_ST_MATRICULA LIKE '%{matricula}' ".format(matricula=matricula)
+            sql += "AND HE02_ST_MATRICULA LIKE '%{matricula}' ".format(
+                                                     matricula=matricula
+                                                    )
         if nome:
             sql += "AND HE02_ST_NOME LIKE '%{nome}%'".format(nome=nome)
             
