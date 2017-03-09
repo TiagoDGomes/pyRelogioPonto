@@ -85,7 +85,7 @@ class Orion5ODBCMode(RelogioPonto):
                             WHERE HE02_ST_PIS = ?""", pis)
         
         row = cursor.fetchone()
-        if row: # se há um colaborador com PIS... 
+        if row: # se há um colaborador com PIS, atualizar... 
             sql = '''UPDATE HE02 SET HE02_ST_MATRICULA = ?, 
                             HE02_ST_NOME = ? , 
                             HE02_BL_VERIFDIG = ? 
@@ -103,7 +103,7 @@ class Orion5ODBCMode(RelogioPonto):
                                     )
                            )
             row = cursor.fetchone()
-            if row: # se tem colaborador com uma matrícula especifica...
+            if row: # se tem colaborador com uma matrícula especifica, atualizar...
                 sql = '''UPDATE HE02 
                             SET HE02_ST_PIS = ?, 
                             HE02_ST_NOME = ? , 
@@ -113,7 +113,8 @@ class Orion5ODBCMode(RelogioPonto):
                 # inverter parâmetros
                 param_sql[0] = pis
                 param_sql[3] = matricula  
-            else:                
+            else: 
+                # senão, inserir novo registro...               
                 sql = '''INSERT INTO HE02 (HE02_ST_MATRICULA,
                                             HE02_ST_NOME,
                                             HE02_BL_VERIFDIG,
