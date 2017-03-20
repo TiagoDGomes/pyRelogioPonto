@@ -69,7 +69,12 @@ class Orion5ODBCMode(RelogioPonto):
         param_sql = []
         param_sql.append( matricula ) 
         param_sql.append( colaborador.nome )
-        param_sql.append( colaborador.verificar_digital )
+        ja_executou = False
+        if colaborador.verificar_digital is not None:
+            p = 1 if colaborador.verificar_digital else 0 
+            param_sql.append(p)
+        else:
+            param_sql.append(1)
         param_sql.append( pis )
 
         
@@ -90,19 +95,20 @@ class Orion5ODBCMode(RelogioPonto):
                             SET HE02_ST_PIS = ?, 
                             HE02_ST_NOME = ? , 
                             HE02_BL_VERIFDIG = ? 
-                            WHERE HE02_ST_MATRICULA = ?  
-                            '''
+                            WHERE HE02_ST_MATRICULA LIKE '%{matricula}'
+                            '''.format(matricula=colaborador.matriculas[0])
                 # inverter parâmetros
                 param_sql[0] = pis
-                param_sql[3] = matricula  
-            else:                
+                cursor.execute(sql,param_sql[0],param_sql[1],param_sql[2]) #atualizar dados        
+                ja_executou = True
+            else:              
                 sql = '''INSERT INTO HE02 (HE02_ST_MATRICULA,
                                             HE02_ST_NOME,
                                             HE02_BL_VERIFDIG,
                                             HE02_ST_PIS) 
                                 VALUES (?,?,?,?) '''
-                 
-        cursor.execute(sql,param_sql[0],param_sql[1],param_sql[2],param_sql[3]) #atualizar dados        
+        if not ja_executou:         
+            cursor.execute(sql,param_sql[0],param_sql[1],param_sql[2],param_sql[3]) #atualizar dados        
             
         cursor.execute("SELECT HE02_AT_COD FROM HE02 WHERE HE02_ST_PIS = ?", pis)
         row = cursor.fetchone()
