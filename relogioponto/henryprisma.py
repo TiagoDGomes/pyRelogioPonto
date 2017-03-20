@@ -71,19 +71,21 @@ class HenryPrisma(RelogioPonto):
                 from html.parser import HTMLParser
             raise RelogioPontoException(HTMLParser().unescape(resposta.text))
          
-    def gravar_colaborador(self, colaborador):
-        
+    def gravar_colaborador(self, colaborador):        
         registration = ''
         chkVerDig = ''
+        id_ = '%3Fid%3F'
+        if colaborador.id:
+            id_ = colaborador.id
         if colaborador.verificar_digital:
             chkVerDig = 'chkVerDig=on&'
         for matricula in colaborador.matriculas:
             registration = '{old}registration[]={new}&'.format(old=registration, new=matricula) 
-        data = ('option=1&index=0&id=%3Fid%3F&wizard=0&pageIndex=0&x=22&y=24&lblName={nome}&lblPis={pis}&{chkVerDig}{registration}'
-                .format(nome=colaborador.nome, pis=colaborador.pis, chkVerDig=chkVerDig, registration=registration))  
-
+        data = ('option=1&index=0&id={id}&wizard=0&pageIndex=0&x=22&y=24&lblName={nome}&lblPis={pis}&{chkVerDig}{registration}'
+                .format(id=id_, nome=colaborador.nome, pis=colaborador.pis, chkVerDig=chkVerDig, registration=registration))  
         self._sendpost(data)
         colaborador.id = self.colaboradores.filter(pis=colaborador.pis)[0].id
+        
         
     def apagar_colaborador(self, colaborador):
         data = ('option=3&index=0&id={id}&wizard=0&pageIndex=0&x=10&y=6&cbxOrderBy=0&lblFilterName=&lblFilterPis=&lblFilterRegistration='
