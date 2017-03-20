@@ -4,17 +4,31 @@ from threading import Thread
 import time
 from .util import remover_acentos
 from datetime import datetime
+from pprint import pprint
+
 
  
 
 def get_rep_suportados():
-    from . import henryprisma
+    from . import henryprisma, henryorion5
     return [
              (1, 'Henry - Prisma', henryprisma.HenryPrisma, [
-                                                             ('endereco','str'),
-                                                             ('porta','int'),                                                             
+                                                             ('endereco', str),
+                                                             ('porta', int),
+                                                             ('login', str),
+                                                             ('password', str),                                                                                                                          
                                                             ]),
+            (2, 'Henry - Orion V (usando database do programa host)', henryorion5.Orion5ODBCMode, [
+                                                             ('conn_str', str),                                                                                                                         
+                                                            ]),
+            
            ]
+
+def get_class_por_tipo(tipo):
+    for rep in get_rep_suportados():
+        if tipo == rep[0]:
+            return rep[2]
+    return None
 
 class Colaborador(object):
     
@@ -82,7 +96,7 @@ class Empregador(object):
     
 class RelogioPonto(object):
     
-    def __init__(self, endereco, porta=3000):
+    def __init__(self, endereco, porta=3000, *args, **kwargs):
         self.tcp_socket = None
         self.endereco = endereco
         self.porta = porta
@@ -148,6 +162,10 @@ class RelogioPonto(object):
     def colaboradores(self):
         raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (colaboradores)')
     
+    @property    
+    def quantidade_eventos_registrados(self):
+        raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (quantidade_eventos)')
+    
     def get_afd(self, nsr=None, data_hora=None):
         raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (get_afd)')
     
@@ -184,8 +202,10 @@ class RelogioPonto(object):
 
     def get_registros(self, nsr=None, data_hora=None):
         afd = self.get_afd(nsr, data_hora)
+
         registros = []
-        for linha in afd.split('\r\n'):
+        for linha in afd.split('\r\n'):   
+                   
             if len(linha) > 0:
                 registro = {}                
                 registro['nsr'] = int(linha[0:9])
@@ -226,13 +246,14 @@ class RelogioPonto(object):
                             colaborador = Colaborador(self)
                             colaborador.pis = linha[22:34] 
                             registro['colaborador'] = colaborador
-                                             
+                                       
                         
-
+                    
                 registros.append(registro)
         return (registros)     
 
     
 class RelogioPontoException(Exception):
     pass
+
 

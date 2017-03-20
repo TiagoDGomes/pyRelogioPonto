@@ -67,6 +67,10 @@ class TestRelogioPonto(unittest.TestCase):
         with self.assertRaises(NotImplementedError) as e:
             lista = self.relogio.apagar_colaborador(colaborador)
             
+    def test_quantidade_eventos_registrados(self):             
+        with self.assertRaises(NotImplementedError) as e:
+            teste = self.relogio.quantidade_eventos_registrados
+            
     def test_enviarcomando(self):
         try:
             os.remove('callback_ok')

@@ -114,8 +114,6 @@ class TestHenryPrisma(unittest.TestCase):
             alterado_empregador.documento = u'00.000.000/0000-00'
             alterado_empregador.tipo_documento = 1
             alterado_empregador.cei = u'00.000.00000/00'
-            print alterado_empregador
-            print empregador
             with self.assertRaises(RelogioPontoException):
                 self.relogio.set_empregador(alterado_empregador) 
             
@@ -143,6 +141,12 @@ class TestHenryPrisma(unittest.TestCase):
     def test_getafd_datahora(self):
         filtro = self.relogio.get_afd(data_hora=datetime.now())
         self.assertEqual(filtro,'')
+    
+
+    def test_quantidade_eventos_registrados(self):
+        i = self.relogio.quantidade_eventos_registrados
+        
+        self.assertEqual(int, type(i))
     
 
 

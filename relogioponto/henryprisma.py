@@ -18,16 +18,23 @@ class HenryPrisma(RelogioPonto):
         self.URL = 'http://{endereco}/prisma.cgi'.format(endereco=self.endereco)
         self.login = 'prisma'
         self.password = '123456'
+        if 'login' in kwargs and kwargs['login']:
+            self.login = kwargs['login']
+        if 'password' in kwargs and kwargs['password']:
+            self.password = kwargs['password']
         
-    def conectar(self):
+    def conectar(self, via_raw=False):
         self.conectar_via_http()
-        RelogioPonto.conectar(self)
+        if via_raw:
+            self.porta = 3000
+            RelogioPonto.conectar(self)
         
         
     def conectar_via_http(self):
-        if not self.conectado_via_http:
+        #if not self.conectado_via_http:
             values = {'login': self.login, 'password': self.password, 'option': '10', 'x': '0', 'y': '0'}
-            data = urllib.urlencode(values)           
+            data = urllib.urlencode(values) 
+            url = self.URL          
             req = urllib2.Request(self.URL, data)
             response = urllib2.urlopen(req)
             the_page = response.read()            
@@ -49,7 +56,8 @@ class HenryPrisma(RelogioPonto):
     
 
     def _send(self, post_raw):
-        browser = mechanize.Browser() 
+        browser = mechanize.Browser()
+        self.conectar()
         try:
             response = browser.open(self.URL, data=post_raw)
         except Exception as e:
@@ -80,13 +88,13 @@ class HenryPrisma(RelogioPonto):
         if colaborador.verificar_digital:
             chkVerDig = 'chkVerDig=on&'
         for matricula in colaborador.matriculas:
-            registration = '{old}registration[]={new}&'.format(old=registration, new=matricula) 
+            registration = '{old}registration[]={new}&'.format(old=registration, new=matricula)   
         data = ('option=1&index=0&id={id}&wizard=0&pageIndex=0&x=22&y=24&lblName={nome}&lblPis={pis}&{chkVerDig}{registration}'
                 .format(id=id_, nome=colaborador.nome, pis=colaborador.pis, chkVerDig=chkVerDig, registration=registration))  
         self._sendpost(data)
         colaborador.id = self.colaboradores.filter(pis=colaborador.pis)[0].id
         
-        
+
     def apagar_colaborador(self, colaborador):
         data = ('option=3&index=0&id={id}&wizard=0&pageIndex=0&x=10&y=6&cbxOrderBy=0&lblFilterName=&lblFilterPis=&lblFilterRegistration='
                 .format(id=colaborador.id))  
@@ -126,7 +134,6 @@ class HenryPrisma(RelogioPonto):
         soup = BeautifulSoup(html)
         resposta = [value for key, value in soup.find("input", id='edtDateTime').attrs if key == 'value'][0]
         return datetime.strptime(resposta, '%d/%m/%Y %H:%M:%S')
-
     
     @data_hora.setter
     def data_hora(self, date_value):
@@ -134,6 +141,14 @@ class HenryPrisma(RelogioPonto):
         raw = 'option=1&index=3&id=-1&wizard=0&edtDateTime={date_formatted}&x=40&y=18'.format(date_formatted=date_formatted)
         self._sendpost(raw)
         
+        
+    @property
+    def quantidade_eventos_registrados(self):
+        raw = 'optionMenu=18&indexMenu=9&idMenu=&pageIndexMenu='
+        html = self._send(raw)
+        soup = BeautifulSoup(html)
+        resposta = int(soup.find(id='statusEquipament').find('fieldset').find('table').findAll('td')[11].find(attrs={'class': 'fonte15'}).text)
+        return resposta
         
     def get_empregador(self):
         empregador = Empregador()
