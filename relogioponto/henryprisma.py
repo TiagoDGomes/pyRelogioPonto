@@ -83,10 +83,14 @@ class HenryPrisma(RelogioPonto):
         
         registration = ''
         chkVerDig = ''
+        
         if colaborador.id:
             id_ = colaborador.id
+        
         else:
+        
             id_ = '%3Fid%3F'
+        
         if colaborador.verificar_digital:
             chkVerDig = 'chkVerDig=on&'
         for matricula in colaborador.matriculas:
