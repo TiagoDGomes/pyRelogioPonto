@@ -82,15 +82,18 @@ class HenryPrisma(RelogioPonto):
     def gravar_colaborador(self, colaborador):        
         registration = ''
         chkVerDig = ''
-        id_ = '%3Fid%3F'
+
         if colaborador.id:
             id_ = colaborador.id
+        else:
+            id_ = '%3Fid%3F'
         if colaborador.verificar_digital:
             chkVerDig = 'chkVerDig=on&'
         for matricula in colaborador.matriculas:
-            registration = '{old}registration[]={new}&'.format(old=registration, new=matricula)   
-        data = ('option=1&index=0&id={id}&wizard=0&pageIndex=0&x=22&y=24&lblName={nome}&lblPis={pis}&{chkVerDig}{registration}'
-                .format(id=id_, nome=colaborador.nome, pis=colaborador.pis, chkVerDig=chkVerDig, registration=registration))  
+            registration = '{old}registration[]={new}&'.format(old=registration, new=matricula) 
+        data = ('option=1&index=0&id={id_}&wizard=0&pageIndex=0&x=22&y=24&lblName={nome}&lblPis={pis}&{chkVerDig}{registration}'
+                .format(id_=id_, nome=colaborador.nome, pis=colaborador.pis, chkVerDig=chkVerDig, registration=registration))  
+
         self._sendpost(data)
         colaborador.id = self.colaboradores.filter(pis=colaborador.pis)[0].id
         
