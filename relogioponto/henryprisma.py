@@ -79,10 +79,10 @@ class HenryPrisma(RelogioPonto):
                 from html.parser import HTMLParser
             raise RelogioPontoException(HTMLParser().unescape(resposta.text))
          
-    def gravar_colaborador(self, colaborador):
-        
+    def gravar_colaborador(self, colaborador):        
         registration = ''
         chkVerDig = ''
+
         if colaborador.id:
             id_ = colaborador.id
         else:
@@ -97,6 +97,7 @@ class HenryPrisma(RelogioPonto):
         self._sendpost(data)
         colaborador.id = self.colaboradores.filter(pis=colaborador.pis)[0].id
         
+
     def apagar_colaborador(self, colaborador):
         data = ('option=3&index=0&id={id}&wizard=0&pageIndex=0&x=10&y=6&cbxOrderBy=0&lblFilterName=&lblFilterPis=&lblFilterRegistration='
                 .format(id=colaborador.id))  

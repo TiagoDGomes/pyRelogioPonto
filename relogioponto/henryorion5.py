@@ -74,66 +74,53 @@ class Orion5ODBCMode(RelogioPonto):
         matricula = "{:020}".format( colaborador.matriculas[0] )
         cursor = self.conn.cursor()
         param_sql = []
-        param_sql.append(matricula) 
-        param_sql.append(colaborador.nome)
-        param_sql.append(colaborador.verificar_digital)
-        param_sql.append(pis)
+        param_sql.append( matricula ) 
+        param_sql.append( colaborador.nome )
+        ja_executou = False
+        if colaborador.verificar_digital is not None:
+            p = 1 if colaborador.verificar_digital else 0 
+            param_sql.append(p)
+        else:
+            param_sql.append(1)
+        param_sql.append( pis )
+
 
         
-        cursor.execute("""SELECT HE02_ST_PIS 
-                            FROM HE02 
-                            WHERE HE02_ST_PIS = ?""", pis)
-        
+        cursor.execute("SELECT HE02_ST_PIS FROM HE02 WHERE HE02_ST_PIS = ?", pis)
         row = cursor.fetchone()
-        if row: # se há um colaborador com PIS, atualizar... 
+        if row: # se há um colaborador com PIS... 
             sql = '''UPDATE HE02 SET HE02_ST_MATRICULA = ?, 
                             HE02_ST_NOME = ? , 
                             HE02_BL_VERIFDIG = ? 
-                     WHERE HE02_ST_PIS = ?  
-                     '''
+                            WHERE HE02_ST_PIS = ?  
+                            '''
             
         else: 
-            # PIS não encontrado. Procurar por matrícula...
-            cursor.execute("""SELECT HE02_ST_MATRICULA 
-                              FROM HE02 
-                              WHERE HE02_ST_MATRICULA 
-                                  LIKE '%{matricula}'
-                            """.format(
-                                    matricula=colaborador.matriculas[0]
-                                    )
-                           )
+            cursor.execute("SELECT HE02_ST_MATRICULA FROM HE02 WHERE HE02_ST_MATRICULA LIKE '%{matricula}'".format(matricula=colaborador.matriculas[0]))
             row = cursor.fetchone()
-            if row: # se tem colaborador com uma matrícula especifica, atualizar...
+            if row: # se tem colaborador com uma matrícula especifica...
                 sql = '''UPDATE HE02 
                             SET HE02_ST_PIS = ?, 
                             HE02_ST_NOME = ? , 
                             HE02_BL_VERIFDIG = ? 
-                            WHERE HE02_ST_MATRICULA = ?  
-                            '''
+                            WHERE HE02_ST_MATRICULA LIKE '%{matricula}'
+                            '''.format(matricula=colaborador.matriculas[0])
                 # inverter parâmetros
                 param_sql[0] = pis
-                param_sql[3] = matricula  
-            else: 
-                # senão, inserir novo registro...               
+                cursor.execute(sql,param_sql[0],param_sql[1],param_sql[2]) #atualizar dados        
+                ja_executou = True
+            else:              
                 sql = '''INSERT INTO HE02 (HE02_ST_MATRICULA,
                                             HE02_ST_NOME,
                                             HE02_BL_VERIFDIG,
                                             HE02_ST_PIS) 
                                 VALUES (?,?,?,?) '''
-                 
-        cursor.execute(sql,
-                       param_sql[0],
-                       param_sql[1],
-                       param_sql[2],
-                       param_sql[3]) #atualizar dados        
+        if not ja_executou:         
+            cursor.execute(sql,param_sql[0],param_sql[1],param_sql[2],param_sql[3]) #atualizar dados        
             
-        cursor.execute("""
-                        SELECT HE02_AT_COD 
-                        FROM HE02 WHERE HE02_ST_PIS = ?""",
-                        pis
-                      )
+        cursor.execute("SELECT HE02_AT_COD FROM HE02 WHERE HE02_ST_PIS = ?", pis)
         row = cursor.fetchone()
-        colaborador.id = row[0]   
+        colaborador.id = row[0]     
          
          
 class ColaboradorOrion5ODBCLista(object):
