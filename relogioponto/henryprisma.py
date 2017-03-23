@@ -83,12 +83,16 @@ class HenryPrisma(RelogioPonto):
         
         registration = ''
         chkVerDig = ''
+        if colaborador.id:
+            id_ = colaborador.id
+        else:
+            id_ = '%3Fid%3F'
         if colaborador.verificar_digital:
             chkVerDig = 'chkVerDig=on&'
         for matricula in colaborador.matriculas:
             registration = '{old}registration[]={new}&'.format(old=registration, new=matricula) 
-        data = ('option=1&index=0&id=%3Fid%3F&wizard=0&pageIndex=0&x=22&y=24&lblName={nome}&lblPis={pis}&{chkVerDig}{registration}'
-                .format(nome=colaborador.nome, pis=colaborador.pis, chkVerDig=chkVerDig, registration=registration))  
+        data = ('option=1&index=0&id={id_}&wizard=0&pageIndex=0&x=22&y=24&lblName={nome}&lblPis={pis}&{chkVerDig}{registration}'
+                .format(id_=id_, nome=colaborador.nome, pis=colaborador.pis, chkVerDig=chkVerDig, registration=registration))  
 
         self._sendpost(data)
         colaborador.id = self.colaboradores.filter(pis=colaborador.pis)[0].id
