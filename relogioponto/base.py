@@ -200,7 +200,7 @@ class RelogioPonto(object):
     def set_empregador(self, empregador):
         raise NotImplementedError('Implementacao ausente na classe filha de RelogioPonto (get_empregador)')
 
-    def get_registros(self, nsr=None, data_hora=None):
+    def get_registros(self, nsr=None, data_hora=None, buscar_colaborador=True):
         afd = self.get_afd(nsr, data_hora)
 
         registros = []
@@ -239,7 +239,9 @@ class RelogioPonto(object):
                         
                     elif tipo == 3: #Registro de marcação de ponto 
                         registro['data_marcacao'] = datetime.strptime(linha[10:22],"%d%m%Y%H%M")
-                        colaborador = self.colaboradores.filter(pis=int(linha[22:34]))
+                        colaborador = None
+                        if buscar_colaborador:
+                            colaborador = self.colaboradores.filter(pis=int(linha[22:34]))
                         if colaborador:                        
                             registro['colaborador'] = colaborador[0]
                         else:
