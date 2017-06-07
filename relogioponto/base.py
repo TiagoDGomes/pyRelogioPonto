@@ -239,7 +239,7 @@ class RelogioPonto(object):
                         
                     elif tipo == 3: #Registro de marcação de ponto 
                         registro['data_marcacao'] = datetime.strptime(linha[10:22],"%d%m%Y%H%M")
-                        colaborador = self.colaboradores.filter(pis=linha[22:34])
+                        colaborador = self.colaboradores.filter(pis=int(linha[22:34]))
                         if colaborador:                        
                             registro['colaborador'] = colaborador[0]
                         else:
