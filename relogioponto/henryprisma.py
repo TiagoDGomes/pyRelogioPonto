@@ -86,7 +86,10 @@ class HenryPrisma(RelogioPonto):
         if colaborador.id:
             id_ = colaborador.id
         else:
-            id_ = '%3Fid%3F'
+            try:
+                id_ = self.colaboradores.filter(pis=colaborador.pis)[0].id
+            except:        
+                id_ = '%3Fid%3F'
         if colaborador.verificar_digital:
             chkVerDig = 'chkVerDig=on&'
         for matricula in colaborador.matriculas:
@@ -95,7 +98,14 @@ class HenryPrisma(RelogioPonto):
                 .format(id_=id_, nome=colaborador.nome, pis=colaborador.pis, chkVerDig=chkVerDig, registration=registration))  
 
         self._sendpost(data)
-        colaborador.id = self.colaboradores.filter(pis=colaborador.pis)[0].id
+        import time
+        time.sleep(1.5)
+        try:
+              colaborador_filter = self.colaboradores.filter(pis=colaborador.pis)
+              colaborador = colaborador_filter[0]
+        except:
+              raise RelogioPontoException('Houve um erro ao analisar se o colaborador foi salvo em %s' % self)
+
         
 
     def apagar_colaborador(self, colaborador):
